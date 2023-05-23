@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Woosh.Signals
 {
-    public abstract class ObservableGenericComponent<T> : ObservableComponent, IComponent<T> where T : class, IObservable
+    public abstract class ObservableGenericComponent<T> : IComponent<T> where T : class, IObservable
     {
         public IDispatcher Events => Attached.Events;
 
@@ -61,11 +61,5 @@ namespace Woosh.Signals
                     Events.Unregister(method.Event, method.Delegate);
             }
         }
-    }
-
-    public abstract class ObservableComponent
-    {
-        [AttributeUsage(AttributeTargets.Method)]
-        public sealed class AutoAttribute : Attribute { }
     }
 }

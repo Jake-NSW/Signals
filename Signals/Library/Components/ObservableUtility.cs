@@ -32,7 +32,7 @@ namespace Woosh.Signals
 
         public static Span<(Type Event, Delegate Delegate)> AssignMethodToCache(Type type, object instance)
         {
-            var methods = type.GetMethods(BindingFlags.Instance).Where(m => m.GetCustomAttribute<ObservableComponent.AutoAttribute>() != null).ToArray();
+            var methods = type.GetMethods(BindingFlags.Instance).Where(m => m.GetCustomAttribute<AutoAttribute>() != null).ToArray();
 
             Span<(Type Event, Delegate Delegate)> library = new (Type Event, Delegate Delegate)[methods.Length];
             var cache = new (MethodInfo methodInfo, Type Event)[methods.Length];

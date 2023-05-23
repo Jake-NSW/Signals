@@ -11,6 +11,9 @@ namespace Woosh.Signals
         {
             hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
         }
+        
+        
+        // Collision
 
         private void OnCollisionEnter(Collision other)
         {
