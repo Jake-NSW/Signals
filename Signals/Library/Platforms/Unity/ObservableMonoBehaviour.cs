@@ -30,9 +30,21 @@ namespace Woosh.Signals
         }
     }
 
-    public abstract class ObservableMonoBehaviour : MonoBehaviour
+    public abstract class ObservableMonoBehaviour : MonoBehaviour, IObservable
     {
-        public IDispatcher Events { get; }
+        private InternalMonoDispatcher m_Observable;
+
+        public IDispatcher Events
+        {
+            get
+            {
+                if (m_Observable != null)
+                    return m_Observable.Events;
+
+                m_Observable = TryGetComponent<InternalMonoDispatcher>(out var comp) ? comp : gameObject.AddComponent<InternalMonoDispatcher>();
+                return m_Observable.Events;
+            }
+        }
 
         protected virtual void OnAttached() { }
         protected virtual void OnDetached() { }
