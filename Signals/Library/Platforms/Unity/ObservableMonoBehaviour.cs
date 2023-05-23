@@ -67,21 +67,13 @@ namespace Woosh.Signals
 
         protected virtual void OnAutoRegister()
         {
-            if (m_Library == null)
-            {
-                AppendAutoMethods();
-            }
+            m_Library ??= ObservableUtility.AutoMethodsFromType(GetType(), this).ToArray();
 
-            foreach (var method in m_Library!)
+            foreach (var method in m_Library)
             {
                 if (method.Event != null)
                     Registry.Register(method.Event, method.Delegate);
             }
-        }
-
-        private void AppendAutoMethods()
-        {
-            m_Library = ObservableUtility.AutoMethodsFromType(GetType(), this).ToArray();
         }
 
         protected virtual void OnAutoUnregister()
