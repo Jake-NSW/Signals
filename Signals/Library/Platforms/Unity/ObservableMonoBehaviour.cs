@@ -1,9 +1,35 @@
 ﻿#if UNITY
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Woosh.Signals
 {
+    public abstract class ObservableMonoBehaviour<T> : ObservableMonoBehaviour where T : struct, ITuple
+    {
+        private T? m_Tuple;
+
+        protected T Components
+        {
+            get
+            {
+                if (m_Tuple.HasValue)
+                    return m_Tuple.Value;
+
+                var types = typeof(T).GetGenericArguments();
+                var args = new object[types.Length];
+
+                for (int i = 0; i < args.Length; i++)
+                {
+                    args[i] = GetComponent(types[i]);
+                }
+
+                m_Tuple = (T)Activator.CreateInstance(typeof(T), args);
+                return m_Tuple.Value;
+            }
+        }
+    }
+
     public abstract class ObservableMonoBehaviour : MonoBehaviour
     {
         public IDispatcher Events { get; }
