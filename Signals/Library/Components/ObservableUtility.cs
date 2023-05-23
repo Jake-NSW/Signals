@@ -23,7 +23,7 @@ namespace Woosh.Signals
 
             for (var i = 0; i < items.Length; i++)
             {
-                var callback = items[i].Method.CreateDelegate(typeof(Action<>).MakeGenericType(items[i].Event), instance);
+                var callback = items[i].Method.CreateDelegate(typeof(StructCallback<>).MakeGenericType(items[i].Event), instance);
                 library[i] = (items[i].Event, callback);
             }
 
