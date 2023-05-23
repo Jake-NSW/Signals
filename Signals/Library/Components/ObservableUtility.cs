@@ -41,12 +41,12 @@ namespace Woosh.Signals
             {
                 var methodInfo = methods[i];
                 var parameters = methodInfo.GetParameters();
-                if (parameters.Length != 1)
+                if (parameters.Length != 1 && !parameters[0].ParameterType.IsGenericParameter)
                 {
-                    throw new MethodAccessException("Invalid number of parameters");
+                    throw new MethodAccessException("Invalid Auto Parameters");
                 }
 
-                var parameterType = parameters[0].ParameterType;
+                var parameterType = parameters[0].ParameterType.GetGenericArguments()[0];
                 var callback = methodInfo.CreateDelegate(typeof(StructCallback<>).MakeGenericType(parameterType), instance);
 
                 cache[i] = (methodInfo, parameterType);
