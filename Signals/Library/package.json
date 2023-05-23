@@ -1,0 +1,11 @@
+{
+  "name": "com.woosh.signals",
+  "version": "0.0.1",
+  "displayName": "Woosh.Signals",
+  "description": "A simple signals library for Unity",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "dependencies": {
+  },
+  "keywords": []
+}
