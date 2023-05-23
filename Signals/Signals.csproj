@@ -5,16 +5,38 @@
         <Nullable>disable</Nullable>
         <Configurations>Release;Unity</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <LangVersion>9</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Unity' ">
-      <DefineConstants>TRACE;UNITY_2020_OR_NEWER</DefineConstants>
+      <DefineConstants>TRACE;</DefineConstants>
+      <OutputPath>Binaries\Unity\libs\</OutputPath>
+      <Optimize>true</Optimize>
+      <DocumentationFile>Binaries\Unity\libs\Signals.xml</DocumentationFile>
+      <DebugType>none</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
       <Reference Include="UnityEngine">
         <HintPath>D:\Programs\Unity\Editors\2022.2.8f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
+        <Private>False</Private>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Binaries\Unity\libs\netstandard2.1\Signals.deps.json" />
+      <None Include="Binaries\Unity\libs\netstandard2.1\Signals.dll" />
+      <None Include="Binaries\Unity\libs\netstandard2.1\Signals.xml" />
+      <None Include="Binaries\Unity\libs\Signals.xml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Binaries\Unity\libs\netstandard2.1.meta" />
+      <Content Include="Binaries\Unity\libs\netstandard2.1\netstandard2.1.meta" />
+      <Content Include="Binaries\Unity\libs\netstandard2.1\Signals.deps.json.meta" />
+      <Content Include="Binaries\Unity\libs\netstandard2.1\Signals.dll.meta" />
+      <Content Include="Binaries\Unity\libs\netstandard2.1\Signals.xml.meta" />
+      <Content Include="Binaries\Unity\libs\Signals.xml.meta" />
     </ItemGroup>
 
 </Project>
