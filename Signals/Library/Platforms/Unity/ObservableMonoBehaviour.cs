@@ -1,4 +1,4 @@
-﻿#if UNITY_2020_OR_NEWER
+﻿#if UNITY
 using System;
 using UnityEngine;
 

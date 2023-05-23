@@ -7,8 +7,6 @@
 Use "Add package from git URL" with
 `https://github.com/Jake-NSW/Signals.git?path=Signals/Binaries/Unity`
 
-###
-
 #### For S&Box
 
 Coming soon
