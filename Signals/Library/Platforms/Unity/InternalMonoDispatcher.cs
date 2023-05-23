@@ -1,8 +1,18 @@
 #if UNITY
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace Woosh.Signals
 {
+    public static class ObservableMonoUtility
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IDispatchTable Registry(this GameObject go)
+        {
+            return go.GetComponent<InternalMonoDispatcher>().Events;
+        }
+    }
+
     internal sealed class InternalMonoDispatcher : MonoBehaviour
     {
         public IDispatcher Events { get; } = new Dispatcher();
@@ -11,8 +21,7 @@ namespace Woosh.Signals
         {
             hideFlags = HideFlags.DontSaveInBuild | HideFlags.DontSaveInEditor;
         }
-        
-        
+
         // Collision
 
         private void OnCollisionEnter(Collision other)
