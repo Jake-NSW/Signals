@@ -3,10 +3,6 @@ using System.Collections.Generic;
 
 namespace Woosh.Signals
 {
-    public interface IObservable
-    {
-        public IDispatcher Events { get; }
-    }
 
     public sealed class Dispatcher : IDispatcher, IDisposable
     {
