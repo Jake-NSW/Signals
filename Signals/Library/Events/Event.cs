@@ -1,4 +1,8 @@
-﻿namespace Woosh.Signals
+﻿#if SANDBOX
+using Sandbox;
+#endif
+
+namespace Woosh.Signals
 {
     public readonly ref struct Event<T> where T : struct, ISignal
     {
@@ -9,6 +13,16 @@
         {
             Data = data;
             From = from;
+
+#if SANDBOX
+            IsPredicted = Prediction.Enabled && Prediction.CurrentHost != null;
+#endif
         }
+#if SANDBOX
+        public bool IsPredicted { get; }
+
+        public bool IsServer => Game.IsServer;
+        public bool IsClient => Game.IsClient;
+#endif
     }
 }

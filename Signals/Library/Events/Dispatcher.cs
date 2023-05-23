@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Woosh.Signals
 {
-
     public sealed class Dispatcher : IDispatcher, IDisposable
     {
         // Registry

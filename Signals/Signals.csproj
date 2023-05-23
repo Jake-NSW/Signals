@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>disable</Nullable>
-        <Configurations>Release;Unity;S&amp;Box</Configurations>
+        <Configurations>Release;Unity;Sandbox</Configurations>
         <Platforms>AnyCPU</Platforms>
         <LangVersion>9</LangVersion>
     </PropertyGroup>
@@ -16,7 +16,28 @@
       <DebugType>none</DebugType>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Sandbox' ">
+      <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'S&amp;Box' ">
+      <DefineConstants>TRACE;SBOX;</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'S&amp;Box' ">
+      <DefineConstants>TRACE;
+SBOX;</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
+      <Reference Include="Sandbox.Engine">
+        <HintPath>D:\Programs\Steam\steamapps\common\sbox\bin\managed\Sandbox.Engine.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="Sandbox.Game">
+        <HintPath>D:\Programs\Steam\steamapps\common\sbox\bin\managed\Sandbox.Game.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
       <Reference Include="UnityEngine">
         <HintPath>D:\Programs\Unity\Editors\2022.2.8f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
         <Private>False</Private>
@@ -37,10 +58,6 @@
       <Content Include="Binaries\Unity\libs\netstandard2.1\Signals.dll.meta" />
       <Content Include="Binaries\Unity\libs\netstandard2.1\Signals.xml.meta" />
       <Content Include="Binaries\Unity\libs\Signals.xml.meta" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Library\Platforms\S&amp;Box\" />
     </ItemGroup>
 
 </Project>

@@ -14,6 +14,7 @@ namespace Woosh.Signals
 
         private readonly static Dictionary<Type, (MethodInfo Method, Type Event)[]> m_Libraries;
 
+#if !SANDBOX
         public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(Type type, object instance)
         {
             if (!m_Libraries.TryGetValue(type, out var items))
@@ -56,5 +57,11 @@ namespace Woosh.Signals
             m_Libraries.Add(type, cache);
             return library;
         }
+#else
+        public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(Type type, object instance)
+        {
+            return null;
+        }
+#endif
     }
 }

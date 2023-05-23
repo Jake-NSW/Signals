@@ -9,5 +9,11 @@ namespace Woosh.Signals
         {
             dispatcher.Register(typeof(T), callback);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Unregister<T>(this IDispatchTable dispatcher, StructCallback<T> callback) where T : struct, ISignal
+        {
+            dispatcher.Unregister(typeof(T), callback);
+        }
     }
 }
