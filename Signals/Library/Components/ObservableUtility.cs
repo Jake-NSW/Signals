@@ -47,7 +47,7 @@ namespace Woosh.Signals
                 }
 
                 var parameterType = parameters[0].ParameterType;
-                var callback = methodInfo.CreateDelegate(typeof(Action<>).MakeGenericType(parameterType), instance);
+                var callback = methodInfo.CreateDelegate(typeof(StructCallback<>).MakeGenericType(parameterType), instance);
 
                 cache[i] = (methodInfo, parameterType);
                 library[i] = (parameterType, callback);
