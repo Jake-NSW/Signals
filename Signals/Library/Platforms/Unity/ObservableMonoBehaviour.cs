@@ -30,11 +30,11 @@ namespace Woosh.Signals
         }
     }
 
-    public abstract class ObservableMonoBehaviour : MonoBehaviour, IObservable
+    public abstract class ObservableMonoBehaviour : MonoBehaviour
     {
         private InternalMonoDispatcher m_Observable;
 
-        public IDispatcher Events
+        private IDispatcher Events
         {
             get
             {
@@ -49,7 +49,19 @@ namespace Woosh.Signals
         protected virtual void OnAttached() { }
         protected virtual void OnDetached() { }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void Signal<T>(T item = default) where T : struct, ISignal
+        {
+            Events.Run(item, this);
+        }
+
         // Registry
+
+        public IDispatchTable Registry
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Events;
+        }
 
         private (Type Event, Delegate Delegate)[] m_Library;
 
@@ -63,7 +75,7 @@ namespace Woosh.Signals
             foreach (var method in m_Library!)
             {
                 if (method.Event != null)
-                    Events.Register(method.Event, method.Delegate);
+                    Registry.Register(method.Event, method.Delegate);
             }
         }
 
@@ -80,7 +92,7 @@ namespace Woosh.Signals
             foreach (var method in m_Library)
             {
                 if (method.Event != null)
-                    Events.Unregister(method.Event, method.Delegate);
+                    Registry.Unregister(method.Event, method.Delegate);
             }
         }
 
