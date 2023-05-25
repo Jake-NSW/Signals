@@ -25,9 +25,9 @@ namespace Woosh.Signals
             table.Run<T>(data: default, from);
         }
 
-        public static EventRegistryRecorder Record(this IDispatchTable table)
+        public static DispatchTableRecorder Record(this IDispatchTable table)
         {
-            return new EventRegistryRecorder(table);
+            return new DispatchTableRecorder(table);
         }
 
         // Register

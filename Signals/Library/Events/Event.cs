@@ -9,6 +9,8 @@ namespace Woosh.Signals
         public T Data { get; }
         public object From { get; }
 
+        public static implicit operator T(Event<T> item) => item.Data;
+
         public Event(T data, object from = null)
         {
             Data = data;

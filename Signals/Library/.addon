@@ -15,10 +15,10 @@
   "Metadata": {
     "ProjectTemplate": null,
     "CsProjName": "Signals.Library",
-    "Summary": "This is a S\u0026box C# library for generating a 3D grid conforming to your terrain",
-    "Description": "This is a S\u0026box C# library for generating a 3D grid conforming to your terrain, customizeable enough to match your MoveHelper for consistent navigation using the implemented A* algorythm.",
-    "Public": true,
-    "ReplaceTags": "grid astar navigation",
+    "Summary": "A simple Component based \u0022Observer Pattern\u0022 implementation",
+    "Description": "",
+    "Public": false,
+    "ReplaceTags": "systems",
     "Compiler": {
       "RootNamespace": "Woosh.Signals",
       "DefineConstants": "SANDBOX;ADDON;DEBUG",

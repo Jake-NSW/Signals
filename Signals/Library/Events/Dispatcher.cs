@@ -35,9 +35,21 @@ namespace Woosh.Signals
                 if (evt.Target == null && !evt.Method.IsStatic)
                     continue;
 #endif
-
-                (evt as Action)?.Invoke();
-                (evt as StructCallback<T>)?.Invoke(passthrough);
+                try
+                {
+                    (evt as Action)?.Invoke();
+                    (evt as StructCallback<T>)?.Invoke(passthrough);
+                }
+                catch (Exception e)
+                {
+                    // The show must go on..
+#if SANDBOX
+                    Log.Error(e);
+#elif UNITY
+                    UnityEngine.Debug.LogException(e);
+#endif
+                    continue;
+                }
             }
         }
 
@@ -70,3 +82,5 @@ namespace Woosh.Signals
         }
     }
 }
+
+public class TEst {}

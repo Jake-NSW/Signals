@@ -6,14 +6,6 @@ using Sandbox;
 
 namespace Woosh.Signals
 {
-    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservableEntity
-    {
-        public new T Entity => base.Entity as T;
-        protected Entity UnderlyingEntity => base.Entity;
-
-        public override bool CanAddToEntity(Entity entity) => entity is T;
-    }
-
     public abstract class ObservableEntityComponent : EntityComponent
     {
         protected IDispatcher Events
@@ -33,18 +25,27 @@ namespace Woosh.Signals
             }
 
             m_Events = recoding.Events.ToArray();
+            foreach (var evt in m_Events)
+            {
+#if DEBUG
+                Log.Info($"Registering - {evt.Event} / on Entity {Entity.Name}");
+#endif
+            }
         }
 
         protected virtual void OnAutoRegister() { }
 
         protected override void OnDeactivate()
         {
-            if (m_Events == null)
+            if (m_Events is not { Length: > 0 })
                 return;
 
             foreach (var item in m_Events)
             {
                 Events.Unregister(item);
+#if DEBUG
+                Log.Info($"Unregistering - {item.Event} / on Entity {Entity.Name}");
+#endif
             }
         }
 
@@ -61,7 +62,10 @@ namespace Woosh.Signals
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void Run<T>(T data = default) where T : struct, ISignal
         {
-            Events.Run(data, this);
+            if (Entity == null)
+                return;
+
+            Events.Run(data);
         }
 
         // Unregister
@@ -71,6 +75,14 @@ namespace Woosh.Signals
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void Unregister<T>(Action evt) where T : struct, ISignal => Events.Unregister<T>(evt);
+    }
+
+    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservableEntity
+    {
+        public new T Entity => base.Entity as T;
+        protected Entity UnderlyingEntity => base.Entity;
+
+        public override bool CanAddToEntity(Entity entity) => entity is T;
     }
 }
 

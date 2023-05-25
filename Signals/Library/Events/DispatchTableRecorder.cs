@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace Woosh.Signals
 {
-    public readonly struct EventRegistryRecorder : IDisposable
+    public readonly struct DispatchTableRecorder : IDisposable
     {
         private readonly IDispatchTable m_Table;
         private readonly HashSet<RegisteredEventType> m_Events;
 
-        public EventRegistryRecorder(IDispatchTable table)
+        public DispatchTableRecorder(IDispatchTable table)
         {
             m_Table = table;
             m_Events = new HashSet<RegisteredEventType>();
