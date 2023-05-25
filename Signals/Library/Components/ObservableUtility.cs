@@ -77,9 +77,21 @@ namespace Woosh.Signals
             return library;
         }
 #else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<RegisteredEventType> AutoRegisterEvents(object instance, IDispatchTable table)
+        {
+            throw new NotImplementedException();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<RegisteredEventType> AutoMethodsFromType(object instance)
+        {
+            throw new NotImplementedException();
+        }
+        
         public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(Type type, object instance)
         {
-            return null;
+            throw new NotImplementedException();
         }
 #endif
     }

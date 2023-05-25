@@ -1,0 +1,30 @@
+{
+  "Title": "Signals",
+  "Type": "library",
+  "Org": "woosh",
+  "Ident": "signals",
+  "Tags": "",
+  "Schema": 1,
+  "HasAssets": false,
+  "AssetsPath": "",
+  "ResourcePaths": null,
+  "HasCode": true,
+  "CodePath": ".",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Metadata": {
+    "ProjectTemplate": null,
+    "CsProjName": "Signals.Library",
+    "Summary": "This is a S\u0026box C# library for generating a 3D grid conforming to your terrain",
+    "Description": "This is a S\u0026box C# library for generating a 3D grid conforming to your terrain, customizeable enough to match your MoveHelper for consistent navigation using the implemented A* algorythm.",
+    "Public": true,
+    "ReplaceTags": "grid astar navigation",
+    "Compiler": {
+      "RootNamespace": "Woosh.Signals",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;1591;",
+      "References": [],
+      "DistinctReferences": []
+    }
+  }
+}

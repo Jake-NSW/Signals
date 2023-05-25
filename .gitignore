@@ -5,4 +5,8 @@ global.json
 Signals/bin 
 Signals/obj 
 
+Signals/Library/bin 
+Signals/Library/obj 
+Signals/Library/Properties 
+
 **/*.DotSettings.user

@@ -44,6 +44,21 @@ SBOX;</DefineConstants>
       </Reference>
     </ItemGroup>
 
+    <!-- Remove sbox Auto Generated -->
+    <ItemGroup>
+        <Content Remove="Library\obj\**"/>
+        <Compile Remove="Library\obj\**"/>
+        <EmbeddedResource Remove="Library\obj\**"/>
+        <None Remove="Library\obj\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Remove="Library\Properties\**"/>
+        <Compile Remove="Library\Properties\**"/>
+        <EmbeddedResource Remove="Library\Properties\**"/>
+        <None Remove="Library\Properties\**"/>
+    </ItemGroup>
+
     <ItemGroup>
       <None Include="Binaries\Unity\libs\netstandard2.1\Signals.deps.json" />
       <None Include="Binaries\Unity\libs\netstandard2.1\Signals.dll" />
