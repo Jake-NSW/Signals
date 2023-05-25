@@ -25,12 +25,6 @@ namespace Woosh.Signals
             }
 
             m_Events = recoding.Events.ToArray();
-            foreach (var evt in m_Events)
-            {
-#if DEBUG
-                Log.Info($"Registering - {evt.Event} / on Entity {Entity.Name}");
-#endif
-            }
         }
 
         protected virtual void OnAutoRegister() { }
@@ -43,9 +37,6 @@ namespace Woosh.Signals
             foreach (var item in m_Events)
             {
                 Events.Unregister(item);
-#if DEBUG
-                Log.Info($"Unregistering - {item.Event} / on Entity {Entity.Name}");
-#endif
             }
         }
 
