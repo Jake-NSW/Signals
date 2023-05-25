@@ -26,8 +26,6 @@ namespace Woosh.Signals
 
         protected override void OnActivate()
         {
-            base.OnActivate();
-
             var recoding = Events.Record();
             using (recoding)
             {
@@ -41,8 +39,6 @@ namespace Woosh.Signals
 
         protected override void OnDeactivate()
         {
-            base.OnDeactivate();
-
             if (m_Events == null)
                 return;
 
