@@ -62,7 +62,7 @@ namespace Woosh.Signals
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Unregister<T>(this IDispatchTable dispatcher, Action callback) where T : struct, ISignal
         {
-            dispatcher.Register(typeof(T), callback);
+            dispatcher.Unregister(typeof(T), callback);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
