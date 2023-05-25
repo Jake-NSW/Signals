@@ -104,5 +104,10 @@ namespace Woosh.Signals
         {
             return Add(new TComp());
         }
+
+        public TComp GetOrCreate<TComp>() where TComp : class, IComponent<T>, new()
+        {
+            return Get<TComp>() ?? Create<TComp>();
+        }
     }
 }

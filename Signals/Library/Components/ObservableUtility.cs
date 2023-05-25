@@ -16,34 +16,45 @@ namespace Woosh.Signals
         private readonly static Dictionary<Type, (MethodInfo Method, Type Event)[]> m_Libraries;
 
 #if !SANDBOX
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<RegisteredEventType> AutoRegisterEvents(object instance, IDispatchTable table)
+        {
+            var events = AutoMethodsFromType(instance);
+            foreach (var evt in events)
+            {
+                table.Register(evt);
+            }
+
+            return events;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(object instance)
+        public static Span<RegisteredEventType> AutoMethodsFromType(object instance)
         {
             return AutoMethodsFromType(instance.GetType(), instance);
         }
 
-        public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(Type type, object instance)
+        public static Span<RegisteredEventType> AutoMethodsFromType(Type type, object instance)
         {
             if (!m_Libraries.TryGetValue(type, out var items))
                 return AssignMethodToCache(type, instance);
 
-            Span<(Type Event, Delegate Delegate)> library = new (Type Event, Delegate Delegate)[items.Length];
+            Span<RegisteredEventType> library = new RegisteredEventType[items.Length];
 
             for (var i = 0; i < items.Length; i++)
             {
                 var callback = items[i].Method.CreateDelegate(typeof(StructCallback<>).MakeGenericType(items[i].Event), instance);
-                library[i] = (items[i].Event, callback);
+                library[i] = new RegisteredEventType(items[i].Event, callback);
             }
 
             return library;
         }
 
-        private static Span<(Type Event, Delegate Delegate)> AssignMethodToCache(Type type, object instance)
+        private static Span<RegisteredEventType> AssignMethodToCache(Type type, object instance)
         {
             var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.GetCustomAttribute<AutoAttribute>() != null).ToArray();
 
-            Span<(Type Event, Delegate Delegate)> library = new (Type Event, Delegate Delegate)[methods.Length];
+            Span<RegisteredEventType> library = new RegisteredEventType[methods.Length];
             var cache = new (MethodInfo methodInfo, Type Event)[methods.Length];
 
             for (var i = 0; i < methods.Length; i++)
@@ -59,7 +70,7 @@ namespace Woosh.Signals
                 var callback = methodInfo.CreateDelegate(typeof(StructCallback<>).MakeGenericType(parameterType), instance);
 
                 cache[i] = (methodInfo, parameterType);
-                library[i] = (parameterType, callback);
+                library[i] = new RegisteredEventType(parameterType, callback);
             }
 
             m_Libraries.Add(type, cache);

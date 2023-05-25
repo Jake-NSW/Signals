@@ -32,7 +32,7 @@ namespace Woosh.Signals
 
         // Registry
 
-        private (Type Event, Delegate Delegate)[] m_Library;
+        private RegisteredEventType[] m_Library;
 
         protected virtual void OnAutoRegister()
         {

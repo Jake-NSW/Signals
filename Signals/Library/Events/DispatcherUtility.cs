@@ -9,11 +9,24 @@ namespace Woosh.Signals
         {
             dispatcher.Register(typeof(T), callback);
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Register(this IDispatchTable table, RegisteredEventType evt)
+        {
+            if (evt.Event != null)
+                table.Register(evt.Event, evt.Delegate);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Unregister<T>(this IDispatchTable dispatcher, StructCallback<T> callback) where T : struct, ISignal
         {
             dispatcher.Unregister(typeof(T), callback);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Unregister(this IDispatchTable table, RegisteredEventType evt)
+        {
+            table.Unregister(evt.Event, evt.Delegate);
         }
     }
 }

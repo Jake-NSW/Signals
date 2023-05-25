@@ -46,8 +46,12 @@ namespace Woosh.Signals
             }
         }
 
+        public event Action<RegisteredEventType> Registered;
+
         public void Register(Type type, Delegate callback)
         {
+            Registered?.Invoke(new RegisteredEventType(type, callback));
+
             if (m_Registry.TryGetValue(type, out var data))
             {
                 data.Add(callback);
