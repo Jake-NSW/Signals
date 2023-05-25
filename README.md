@@ -9,4 +9,4 @@ Use "Add package from git URL" with
 
 #### For S&Box
 
-Coming soon
+Add `woosh.signals` to your package references. Which can be found from `{Project} > Packages > Package References`
