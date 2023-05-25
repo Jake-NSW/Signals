@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Woosh.Signals
 {
@@ -15,6 +16,13 @@ namespace Woosh.Signals
         private readonly static Dictionary<Type, (MethodInfo Method, Type Event)[]> m_Libraries;
 
 #if !SANDBOX
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(object instance)
+        {
+            return AutoMethodsFromType(instance.GetType(), instance);
+        }
+
         public static Span<(Type Event, Delegate Delegate)> AutoMethodsFromType(Type type, object instance)
         {
             if (!m_Libraries.TryGetValue(type, out var items))

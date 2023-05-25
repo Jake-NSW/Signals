@@ -50,7 +50,7 @@ namespace Woosh.Signals
 
         private void AppendAutoMethods()
         {
-            m_Library = ObservableUtility.AutoMethodsFromType(GetType(), this).ToArray();
+            m_Library = ObservableUtility.AutoMethodsFromType(this).ToArray();
         }
 
         protected virtual void OnAutoUnregister()

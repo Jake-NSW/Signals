@@ -31,6 +31,9 @@ namespace Woosh.Signals
             var passthrough = new Event<T>(item, from);
             foreach (var evt in stack)
             {
+                if (evt.Target == null && !evt.Method.IsStatic)
+                    continue;
+
                 (evt as StructCallback<T>)?.Invoke(passthrough);
             }
         }
