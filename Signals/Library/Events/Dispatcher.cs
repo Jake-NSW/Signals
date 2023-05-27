@@ -3,14 +3,20 @@ using System.Collections.Generic;
 
 namespace Woosh.Signals
 {
+    [Flags]
+    public enum Propagation { Trickle, Bubble }
+
     public sealed class Dispatcher : IDispatcher, IDisposable
     {
+        public IObservable Attached { get; }
+
         // Registry
 
         private readonly Dictionary<Type, HashSet<Delegate>> m_Registry;
 
-        public Dispatcher()
+        public Dispatcher(IObservable attached = null)
         {
+            Attached = attached;
             m_Registry = new Dictionary<Type, HashSet<Delegate>>();
         }
 
@@ -51,6 +57,20 @@ namespace Woosh.Signals
                     continue;
                 }
             }
+
+            if (Attached == null)
+                return;
+
+            // Propagate
+            foreach (var dispatcher in Attached.OnTrickleEvent())
+            {
+                dispatcher.Run(item, from);
+            }
+
+            if (Attached.OnBubbleEvent() is { } bubble)
+            {
+                bubble.Run(item, from);
+            }
         }
 
         public void Unregister(Type type, Delegate callback)
@@ -83,4 +103,4 @@ namespace Woosh.Signals
     }
 }
 
-public class TEst {}
+public class TEst { }
