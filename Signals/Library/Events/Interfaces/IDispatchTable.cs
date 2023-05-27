@@ -2,7 +2,7 @@ using System;
 
 namespace Woosh.Signals
 {
-    public interface IDispatchTable
+    public interface IDispatchTable : IDisposable
     {
         event Action<RegisteredEventType> Registered;
         

@@ -102,5 +102,3 @@ namespace Woosh.Signals
         }
     }
 }
-
-public class TEst { }
