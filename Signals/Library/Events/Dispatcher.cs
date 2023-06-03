@@ -4,21 +4,40 @@ using System.Collections.Generic;
 namespace Woosh.Signals
 {
     [Flags]
-    public enum Propagation { None, Trickle, Bubble }
+    public enum Propagation
+    {
+        None,
+        Trickle,
+        Bubble,
+        Both = Trickle | Bubble
+    }
 
+    public delegate IDispatcher BubbleEvent(object attached);
+
+    public delegate IDispatcher[] TrickleEvent(object attached);
+
+    /// <summary>
+    /// The Dispatcher is responsible for dispatching events to all registered callbacks. It will also propagate the event to the
+    /// parent and children of what ever it is attached to. Which is done by using the propagation flags.
+    /// </summary>
     public sealed partial class Dispatcher : IDispatcher
     {
-        private readonly Func<object, IDispatcher> m_Bubble;
-        private readonly Func<object, IEnumerable<IDispatcher>> m_Trickle;
+        /// <summary>
+        /// The Object that this dispatcher has been instantiated for. This is used to determine the parent and children of this
+        /// dispatcher via its Bubble and Trickle callbacks defined in the constructor.
+        /// </summary>
         public object Attached { get; }
 
         // Registry
+        
+        private readonly BubbleEvent m_Bubble;
+        private readonly TrickleEvent m_Trickle;
 
         private readonly Dictionary<Type, HashSet<Delegate>> m_Registry;
 
         public Dispatcher() : this(null, null, null) { }
 
-        public Dispatcher(object attached, Func<object, IDispatcher> bubble, Func<object, IEnumerable<IDispatcher>> trickle)
+        public Dispatcher(object attached, BubbleEvent bubble, TrickleEvent trickle)
         {
             Attached = attached;
 
@@ -66,7 +85,7 @@ namespace Woosh.Signals
                 }
             }
 
-            if (Attached == null)
+            if (Attached == null || propagation == Propagation.None)
                 return true;
 
             // Propagate
@@ -74,10 +93,13 @@ namespace Woosh.Signals
             if (propagation.HasFlag(Propagation.Trickle))
             {
                 // Go to each child and propagate to them
-                foreach (var dispatcher in m_Trickle.Invoke(Attached))
+                var span = m_Trickle.Invoke(Attached);
+                foreach (var dispatcher in span)
                 {
                     if (dispatcher?.Run(item, Propagation.Trickle, from) == false)
+                    {
                         return false;
+                    }
                 }
             }
 

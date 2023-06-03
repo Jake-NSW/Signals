@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Woosh.Signals;
 
-public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEntity
+public abstract class ObservableModelEntity : ModelEntity, IObservableEntity
 {
     private IDispatcher m_Events;
     public IDispatcher Events => m_Events ??= Dispatcher.CreateForEntity(this);

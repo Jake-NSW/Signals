@@ -1,8 +1,7 @@
 ﻿#if SANDBOX
 using Sandbox;
-using Woosh.Signals;
 
-namespace Woosh.Espionage;
+namespace Woosh.Signals;
 
 public abstract class ObservableClientComponent : ObservableEntityComponent
 {

@@ -3,18 +3,10 @@ using Sandbox;
 
 namespace Woosh.Signals;
 
-public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEntity
+public abstract class ObservableEntity : Entity, IObservableEntity
 {
     private IDispatcher m_Events;
     public IDispatcher Events => m_Events ??= Dispatcher.CreateForEntity(this);
-
-    // Model
-
-    public override void OnNewModel(Model model)
-    {
-        base.OnNewModel(model);
-        Events.Run(new ModelChanged(model));
-    }
 
     // Components
 

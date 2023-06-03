@@ -1,9 +1,8 @@
 ﻿#if SANDBOX
 using Sandbox;
 using Sandbox.UI;
-using Woosh.Signals;
 
-namespace Woosh.Espionage;
+namespace Woosh.Signals;
 
 public abstract class EntityHudComponent<TPanel, TEntity> : EntityHudComponent<TPanel> where TPanel : RootPanel, new() where TEntity : class, IObservableEntity
 {
