@@ -4,19 +4,27 @@ using System.Collections.Generic;
 namespace Woosh.Signals
 {
     [Flags]
-    public enum Propagation { Trickle, Bubble }
+    public enum Propagation { None, Trickle, Bubble }
 
-    public sealed class Dispatcher : IDispatcher, IDisposable
+    public sealed partial class Dispatcher : IDispatcher
     {
-        public IObservable Attached { get; }
+        private readonly Func<object, IDispatcher> m_Bubble;
+        private readonly Func<object, IEnumerable<IDispatcher>> m_Trickle;
+        public object Attached { get; }
 
         // Registry
 
         private readonly Dictionary<Type, HashSet<Delegate>> m_Registry;
 
-        public Dispatcher(IObservable attached = null)
+        public Dispatcher() : this(null, null, null) { }
+
+        public Dispatcher(object attached, Func<object, IDispatcher> bubble, Func<object, IEnumerable<IDispatcher>> trickle)
         {
             Attached = attached;
+
+            m_Bubble = bubble;
+            m_Trickle = trickle;
+
             m_Registry = new Dictionary<Type, HashSet<Delegate>>();
         }
 
@@ -27,11 +35,11 @@ namespace Woosh.Signals
 
         // Dispatch
 
-        public void Run<T>(T item, object from = null) where T : struct, ISignal
+        public bool Run<T>(T item, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
             if (!m_Registry.TryGetValue(typeof(T), out var stack))
             {
-                return;
+                return true;
             }
 
             var passthrough = new Event<T>(item, from);
@@ -59,18 +67,31 @@ namespace Woosh.Signals
             }
 
             if (Attached == null)
-                return;
+                return true;
 
             // Propagate
-            foreach (var dispatcher in Attached.OnTrickleEvent())
+
+            if (propagation.HasFlag(Propagation.Trickle))
             {
-                dispatcher.Run(item, from);
+                // Go to each child and propagate to them
+                foreach (var dispatcher in m_Trickle.Invoke(Attached))
+                {
+                    if (dispatcher?.Run(item, Propagation.Trickle, from) == false)
+                        return false;
+                }
             }
 
-            if (Attached.OnBubbleEvent() is { } bubble)
+            if (propagation.HasFlag(Propagation.Bubble))
             {
-                bubble.Run(item, from);
+                // Go to the parent and bubble up the event
+                if (m_Bubble.Invoke(Attached) is { } bubble)
+                {
+                    if (!bubble.Run(item, Propagation.Bubble, from))
+                        return false;
+                }
             }
+
+            return true;
         }
 
         public void Unregister(Type type, Delegate callback)

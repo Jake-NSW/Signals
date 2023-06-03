@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Woosh.Signals
 {
+    public delegate void RefStructInputAction<TInput, in TType>(ref TInput input, TType item);
+
     public sealed class Components<T> where T : class
     {
         public T Owner { get; }
@@ -84,6 +87,7 @@ namespace Woosh.Signals
             return m_Storage.FirstOrDefault(e => e is TComp) as TComp;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Each<TType>(Action<TType> action)
         {
             foreach (var item in m_Storage.OfType<TType>())
@@ -92,6 +96,16 @@ namespace Woosh.Signals
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Each<TInput, TType>(ref TInput input, RefStructInputAction<TInput, TType> action)
+        {
+            foreach (var item in m_Storage.OfType<TType>())
+            {
+                action?.Invoke(ref input, item);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Each<TInput, TType>(TInput input, Action<TInput, TType> action)
         {
             foreach (var item in m_Storage.OfType<TType>())

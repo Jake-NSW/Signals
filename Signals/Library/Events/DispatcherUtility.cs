@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Woosh.Signals
 {
-    public static class DispatcherUtility
+    public static partial class DispatcherUtility
     {
         // Utility
 
@@ -20,9 +20,9 @@ namespace Woosh.Signals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Run<T>(this IDispatchExecutor table, object from = null) where T : struct, ISignal
+        public static void Run<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
-            table.Run<T>(data: default, from);
+            table.Run<T>(data: default, propagation, from);
         }
 
         public static DispatchTableRecorder Record(this IDispatchTable table)

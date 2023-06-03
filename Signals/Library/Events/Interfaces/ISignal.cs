@@ -1,4 +1,7 @@
 namespace Woosh.Signals
 {
-    public interface ISignal { }
+    public interface ISignal
+    {
+        Propagation Propagation { get; }
+    }
 }

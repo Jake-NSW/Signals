@@ -8,7 +8,7 @@ namespace Woosh.Signals
 {
     public abstract class ObservableEntityComponent : EntityComponent
     {
-        protected IDispatcher Events
+        protected virtual IDispatcher Events
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => (Entity as IObservableEntity)?.Events ?? throw new InvalidCastException($"Entity is not observable - {Entity.GetType().FullName}");
@@ -51,12 +51,12 @@ namespace Woosh.Signals
         // Run
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void Run<T>(T data = default) where T : struct, ISignal
+        protected void Run<T>(T data = default, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             if (Entity == null)
                 return;
 
-            Events.Run(data);
+            Events.Run(data, propagation);
         }
 
         // Unregister

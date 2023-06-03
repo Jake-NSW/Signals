@@ -1,8 +1,9 @@
 ﻿#if SANDBOX
 using Sandbox;
-using Woosh.Signals;
 
-namespace Woosh.Espionage;
+namespace Woosh.Signals
+{
+    public readonly record struct EntityPossessed(IClient Client) : ISignal;
+}
 
-public readonly record struct EntityPossessed( IClient Client ) : ISignal;
 #endif
