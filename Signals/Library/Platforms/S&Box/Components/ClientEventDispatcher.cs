@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Woosh.Signals;
 
-internal sealed class ClientEventDispatcher : EntityComponent, IObservable
+internal sealed class ClientEventDispatcher : EntityComponent, IObservable, ISingletonComponent
 {
     public ClientEventDispatcher()
     {

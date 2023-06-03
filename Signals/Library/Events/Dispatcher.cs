@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
@@ -49,6 +50,9 @@ namespace Woosh.Signals
             m_Registry = new Dictionary<Type, HashSet<Delegate>>();
         }
 
+        /// <summary>
+        /// Removes all the events from this dispatchers registry
+        /// </summary>
         public void Dispose()
         {
             m_Registry.Clear();
@@ -68,14 +72,11 @@ namespace Woosh.Signals
             {
                 // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
                 // are propagating events. This is not ideal, but it's not a huge deal either.
-                var passthrough = new Event<T>(item, from);
                 
+                var passthrough = new Event<T>(item, from);
+
                 foreach (var evt in stack)
                 {
-#if UNITY
-                    if (evt.Target == null && !evt.Method.IsStatic)
-                        continue;
-#endif
                     try
                     {
                         (evt as Action)?.Invoke();
@@ -87,7 +88,7 @@ namespace Woosh.Signals
 #if SANDBOX
                         Log.Error(e);
 #elif UNITY
-                    UnityEngine.Debug.LogException(e);
+                        UnityEngine.Debug.LogException(e);
 #endif
                         continue;
                     }
@@ -97,16 +98,12 @@ namespace Woosh.Signals
             if (Attached == null || propagation == Propagation.None)
                 return true;
 
-            // Propagate
-
             if (propagation.HasFlag(Propagation.Trickle))
             {
                 // Go to each child and propagate to them
                 var dispatchers = m_Trickle.Invoke(Attached);
                 foreach (var dispatcher in dispatchers)
                 {
-                    Log.Info($"Dispatching - {typeof(T).Name} to {((Dispatcher)dispatcher).Attached.GetType().Name}");
-
                     if (dispatcher?.Run(item, Propagation.Trickle, from) == false)
                     {
                         return false;
@@ -126,7 +123,7 @@ namespace Woosh.Signals
 
             return true;
         }
-
+        
         /// <summary>
         /// Unregisters a callback from the dispatcher.
         /// </summary>
