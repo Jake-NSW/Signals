@@ -63,34 +63,34 @@ namespace Woosh.Signals
         /// </summary>
         public bool Run<T>(T item, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
-            if (!m_Registry.TryGetValue(typeof(T), out var stack))
+            // Dispatch to our callbacks
+            if (m_Registry.TryGetValue(typeof(T), out var stack))
             {
-                return true;
-            }
-
-            // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
-            // are propagating events. This is not ideal, but it's not a huge deal either.
-            var passthrough = new Event<T>(item, from);
-            foreach (var evt in stack)
-            {
+                // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
+                // are propagating events. This is not ideal, but it's not a huge deal either.
+                var passthrough = new Event<T>(item, from);
+                
+                foreach (var evt in stack)
+                {
 #if UNITY
-                if (evt.Target == null && !evt.Method.IsStatic)
-                    continue;
+                    if (evt.Target == null && !evt.Method.IsStatic)
+                        continue;
 #endif
-                try
-                {
-                    (evt as Action)?.Invoke();
-                    (evt as StructCallback<T>)?.Invoke(passthrough);
-                }
-                catch (Exception e)
-                {
-                    // The show must go on..
+                    try
+                    {
+                        (evt as Action)?.Invoke();
+                        (evt as StructCallback<T>)?.Invoke(passthrough);
+                    }
+                    catch (Exception e)
+                    {
+                        // The show must go on..
 #if SANDBOX
-                    Log.Error(e);
+                        Log.Error(e);
 #elif UNITY
                     UnityEngine.Debug.LogException(e);
 #endif
-                    continue;
+                        continue;
+                    }
                 }
             }
 
@@ -102,9 +102,11 @@ namespace Woosh.Signals
             if (propagation.HasFlag(Propagation.Trickle))
             {
                 // Go to each child and propagate to them
-                var span = m_Trickle.Invoke(Attached);
-                foreach (var dispatcher in span)
+                var dispatchers = m_Trickle.Invoke(Attached);
+                foreach (var dispatcher in dispatchers)
                 {
+                    Log.Info($"Dispatching - {typeof(T).Name} to {((Dispatcher)dispatcher).Attached.GetType().Name}");
+
                     if (dispatcher?.Run(item, Propagation.Trickle, from) == false)
                     {
                         return false;
