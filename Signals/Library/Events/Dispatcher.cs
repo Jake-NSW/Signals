@@ -4,13 +4,7 @@ using System.Collections.Generic;
 namespace Woosh.Signals
 {
     [Flags]
-    public enum Propagation
-    {
-        None,
-        Trickle,
-        Bubble,
-        Both = Trickle | Bubble
-    }
+    public enum Propagation { None, Trickle, Bubble, Both = Trickle | Bubble }
 
     public delegate IDispatcher BubbleEvent(object attached);
 
@@ -29,14 +23,22 @@ namespace Woosh.Signals
         public object Attached { get; }
 
         // Registry
-        
+
         private readonly BubbleEvent m_Bubble;
         private readonly TrickleEvent m_Trickle;
 
         private readonly Dictionary<Type, HashSet<Delegate>> m_Registry;
 
+        /// <summary>
+        /// Creates a basic dispatcher that doesn't propagate events.
+        /// </summary>
         public Dispatcher() : this(null, null, null) { }
 
+
+        /// <summary>
+        /// Creates a dispatcher that has event propagation, that will use the bubble and trickle callbacks to determine the parent
+        /// and children dispatchers. 
+        /// </summary>
         public Dispatcher(object attached, BubbleEvent bubble, TrickleEvent trickle)
         {
             Attached = attached;
@@ -54,6 +56,11 @@ namespace Woosh.Signals
 
         // Dispatch
 
+        /// <summary>
+        /// Runs a new event through the dispatcher, which will then be dispatched to all registered callbacks. An event can be consumed
+        /// by one of its callbacks, which will stop the event from being dispatched to any other callbacks. This is useful for being
+        /// able to stop an event from propagating to the parent or children.
+        /// </summary>
         public bool Run<T>(T item, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
             if (!m_Registry.TryGetValue(typeof(T), out var stack))
@@ -116,6 +123,9 @@ namespace Woosh.Signals
             return true;
         }
 
+        /// <summary>
+        /// Unregisters a callback from the dispatcher.
+        /// </summary>
         public void Unregister(Type type, Delegate callback)
         {
             if (m_Registry.TryGetValue(type, out var stack))
@@ -126,11 +136,17 @@ namespace Woosh.Signals
 
         public event Action<RegisteredEventType> Registered;
 
+        /// <summary>
+        /// Returns the count of all the callbacks registered for the given type.
+        /// </summary>
         public int Count(Type type)
         {
             return m_Registry.TryGetValue(type, out var items) ? items.Count : 0;
         }
 
+        /// <summary>
+        /// Registers a new callback for the dispatcher
+        /// </summary>
         public void Register(Type type, Delegate callback)
         {
             Registered?.Invoke(new RegisteredEventType(type, callback));
