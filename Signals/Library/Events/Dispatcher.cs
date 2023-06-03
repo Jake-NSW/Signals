@@ -68,6 +68,8 @@ namespace Woosh.Signals
                 return true;
             }
 
+            // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
+            // are propagating events. This is not ideal, but it's not a huge deal either.
             var passthrough = new Event<T>(item, from);
             foreach (var evt in stack)
             {
