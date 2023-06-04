@@ -4,5 +4,99 @@
         <name>Signals</name>
     </assembly>
     <members>
+        <member name="T:Woosh.Signals.Dispatcher">
+            <summary>
+            The Dispatcher is responsible for dispatching events to all registered callbacks. It will also propagate the event to the
+            parent and children of what ever it is attached to. Which is done by using the propagation flags.
+            </summary>
+        </member>
+        <member name="P:Woosh.Signals.Dispatcher.Empty">
+            <summary>
+            Provides a way of using a dispatcher that does not do anything. This is useful for when you want to have a
+            observable "Component" but its attached to something that isn't observable.
+            </summary>
+        </member>
+        <member name="P:Woosh.Signals.Dispatcher.Attached">
+            <summary>
+            The Object that this dispatcher has been instantiated for. This is used to determine the parent and children of this
+            dispatcher via its Bubble and Trickle callbacks defined in the constructor.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.#ctor">
+            <summary>
+            Creates a basic dispatcher that doesn't propagate events.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.#ctor(System.Object,Woosh.Signals.BubbleEvent,Woosh.Signals.TrickleEvent)">
+            <summary>
+            Creates a dispatcher that has event propagation, that will use the bubble and trickle callbacks to determine the parent
+            and children dispatchers. 
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.Dispose">
+            <summary>
+            Removes all the events from this dispatchers registry
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.Run``1(``0,Woosh.Signals.Propagation,System.Object)">
+            <summary>
+            Runs a new event through the dispatcher, which will then be dispatched to all registered callbacks. An event can be consumed
+            by one of its callbacks, which will stop the event from being dispatched to any other callbacks. This is useful for being
+            able to stop an event from propagating to the parent or children.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)">
+            <summary>
+            Unregisters a callback from the dispatcher.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.Count(System.Type)">
+            <summary>
+            Returns the count of all the callbacks registered for the given type.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)">
+            <summary>
+            Registers a new callback for the dispatcher
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Any``1(Woosh.Signals.IDispatchTable)">
+            <summary>
+            Checks if there are any callbacks registered for the given signal type.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Count``1(Woosh.Signals.IDispatchTable)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Count(System.Type)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Run``1(Woosh.Signals.IDispatchExecutor,Woosh.Signals.Propagation,System.Object)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Run``1(``0,Woosh.Signals.Propagation,System.Object)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Record(Woosh.Signals.IDispatchTable)">
+            <summary>
+            Records all callbacks invoked by the given dispatcher. This is used to more easily unregister all callbacks registered.
+            Because of this it allows you to use anon functions for callbacks.
+            </summary>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Register``1(Woosh.Signals.IDispatchTable,Woosh.Signals.StructCallback{``0})">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Register``1(Woosh.Signals.IDispatchTable,System.Action)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Register(Woosh.Signals.IDispatchTable,Woosh.Signals.RegisteredEventType)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Unregister``1(Woosh.Signals.IDispatchTable,Woosh.Signals.StructCallback{``0})">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Unregister``1(Woosh.Signals.IDispatchTable,System.Action)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Unregister(Woosh.Signals.IDispatchTable,Woosh.Signals.RegisteredEventType)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.IDispatchExecutor.Run``1(``0,Woosh.Signals.Propagation,System.Object)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Run``1(``0,Woosh.Signals.Propagation,System.Object)"/>
+        </member>
     </members>
 </doc>

@@ -46,17 +46,17 @@ SBOX;</DefineConstants>
 
     <!-- Remove sbox Auto Generated -->
     <ItemGroup>
-        <Content Remove="Library\obj\**"/>
-        <Compile Remove="Library\obj\**"/>
-        <EmbeddedResource Remove="Library\obj\**"/>
-        <None Remove="Library\obj\**"/>
+        <Content Remove="Library\obj\**" />
+        <Compile Remove="Library\obj\**" />
+        <EmbeddedResource Remove="Library\obj\**" />
+        <None Remove="Library\obj\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Remove="Library\Properties\**"/>
-        <Compile Remove="Library\Properties\**"/>
-        <EmbeddedResource Remove="Library\Properties\**"/>
-        <None Remove="Library\Properties\**"/>
+        <Content Remove="Library\Properties\**" />
+        <Compile Remove="Library\Properties\**" />
+        <EmbeddedResource Remove="Library\Properties\**" />
+        <None Remove="Library\Properties\**" />
     </ItemGroup>
 
     <ItemGroup>

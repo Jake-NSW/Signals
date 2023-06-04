@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace Woosh.Signals
 {
@@ -17,6 +17,16 @@ namespace Woosh.Signals
     /// </summary>
     public sealed partial class Dispatcher : IDispatcher
     {
+        /// <summary>
+        /// Provides a way of using a dispatcher that does not do anything. This is useful for when you want to have a
+        /// observable "Component" but its attached to something that isn't observable.
+        /// </summary>
+        public static IDispatcher Empty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => BlankDispatcher.Instance;
+        }
+
         /// <summary>
         /// The Object that this dispatcher has been instantiated for. This is used to determine the parent and children of this
         /// dispatcher via its Bubble and Trickle callbacks defined in the constructor.
@@ -72,7 +82,7 @@ namespace Woosh.Signals
             {
                 // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
                 // are propagating events. This is not ideal, but it's not a huge deal either.
-                
+
                 var passthrough = new Event<T>(item, from);
 
                 foreach (var evt in stack)
@@ -98,7 +108,7 @@ namespace Woosh.Signals
             if (Attached == null || propagation == Propagation.None)
                 return true;
 
-            if (propagation.HasFlag(Propagation.Trickle))
+            if (FastHasFlag(propagation, Propagation.Trickle))
             {
                 // Go to each child and propagate to them
                 var dispatchers = m_Trickle.Invoke(Attached);
@@ -111,7 +121,7 @@ namespace Woosh.Signals
                 }
             }
 
-            if (propagation.HasFlag(Propagation.Bubble))
+            if (FastHasFlag(propagation, Propagation.Bubble))
             {
                 // Go to the parent and bubble up the event
                 if (m_Bubble.Invoke(Attached) is { } bubble)
@@ -123,7 +133,7 @@ namespace Woosh.Signals
 
             return true;
         }
-        
+
         /// <summary>
         /// Unregisters a callback from the dispatcher.
         /// </summary>
@@ -159,6 +169,12 @@ namespace Woosh.Signals
             }
 
             m_Registry.Add(type, new HashSet<Delegate> { callback });
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool FastHasFlag(Propagation flags, Propagation flag)
+        {
+            return (flags & flag) != 0;
         }
     }
 }

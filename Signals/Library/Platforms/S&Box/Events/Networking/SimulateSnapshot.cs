@@ -3,14 +3,6 @@ using Sandbox;
 
 namespace Woosh.Signals
 {
-    public readonly struct SimulateSnapshot : ISignal
-    {
-        public IClient Client { get; }
-
-        public SimulateSnapshot(IClient client)
-        {
-            Client = client;
-        }
-    }
+    public readonly record struct SimulateSnapshot(IClient Client) : ISignal;
 }
 #endif

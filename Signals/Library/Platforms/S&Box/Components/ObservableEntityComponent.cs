@@ -11,7 +11,14 @@ namespace Woosh.Signals
         protected virtual IDispatcher Events
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => (Entity as IObservableEntity)?.Events ?? throw new InvalidCastException($"Entity is not observable - {Entity.GetType().FullName}");
+            get
+            {
+                if (Entity is IObservable observable)
+                    return observable.Events;
+
+                Log.Warning($"Entity is not observable - {Entity.GetType().FullName}");
+                return Dispatcher.Empty;
+            }
         }
 
         private RegisteredEventType[] m_Events;
@@ -58,17 +65,9 @@ namespace Woosh.Signals
 
             Events.Run(data, propagation);
         }
-
-        // Unregister
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void Unregister<T>(StructCallback<T> evt) where T : struct, ISignal => Events.Unregister(evt);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void Unregister<T>(Action evt) where T : struct, ISignal => Events.Unregister<T>(evt);
     }
 
-    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservableEntity
+    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservable
     {
         public new T Entity => base.Entity as T;
         protected Entity UnderlyingEntity => base.Entity;

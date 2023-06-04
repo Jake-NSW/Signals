@@ -4,18 +4,10 @@ using UnityEngine;
 
 namespace Woosh.Signals
 {
-    public static class ObservableMonoUtility
+    internal sealed class InternalMonoDispatcher : MonoBehaviour, IObservable
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IDispatchTable Registry(this GameObject go)
-        {
-            return go.GetComponent<InternalMonoDispatcher>().Events;
-        }
-    }
-
-    internal sealed class InternalMonoDispatcher : MonoBehaviour
-    {
-        public IDispatcher Events { get; } = new Dispatcher();
+        private IDispatcher m_Dispatcher;
+        public IDispatcher Events => m_Dispatcher ??= Dispatcher.CreateForGameObject(gameObject);
 
         private void Awake()
         {

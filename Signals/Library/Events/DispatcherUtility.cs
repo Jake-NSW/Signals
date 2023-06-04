@@ -30,6 +30,10 @@ namespace Woosh.Signals
             table.Run<T>(data: default, propagation, from);
         }
 
+        /// <summary>
+        /// Records all callbacks invoked by the given dispatcher. This is used to more easily unregister all callbacks registered.
+        /// Because of this it allows you to use anon functions for callbacks.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DispatchTableRecorder Record(this IDispatchTable table)
         {
