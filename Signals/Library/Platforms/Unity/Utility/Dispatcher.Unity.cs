@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY
+using UnityEngine;
 
 namespace Woosh.Signals
 {
@@ -40,3 +41,4 @@ namespace Woosh.Signals
         }
     }
 }
+#endif

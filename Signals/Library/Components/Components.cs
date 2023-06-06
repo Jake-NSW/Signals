@@ -61,6 +61,7 @@ namespace Woosh.Signals
         {
             Detach(item);
             m_Storage.Remove(item.Node);
+            item.Node = null;
         }
 
         public void Clear()
@@ -77,7 +78,6 @@ namespace Woosh.Signals
         {
             item.OnDetached();
             item.Attached = null;
-            item.Node = null;
         }
 
         public int Count => m_Storage.Count;
