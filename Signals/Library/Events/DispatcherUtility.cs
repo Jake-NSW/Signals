@@ -51,6 +51,13 @@ namespace Woosh.Signals
 
         /// <inheritdoc cref="Dispatcher.Register"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Register<T>(this IDispatchTable dispatcher, AsyncStructCallback<T> callback) where T : struct, ISignal
+        {
+            dispatcher.Register(typeof(T), callback);
+        }
+
+        /// <inheritdoc cref="Dispatcher.Register"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Register<T>(this IDispatchTable dispatcher, Action callback) where T : struct, ISignal
         {
             dispatcher.Register(typeof(T), callback);
@@ -69,6 +76,13 @@ namespace Woosh.Signals
         /// <inheritdoc cref="Dispatcher.Unregister"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Unregister<T>(this IDispatchTable dispatcher, StructCallback<T> callback) where T : struct, ISignal
+        {
+            dispatcher.Unregister(typeof(T), callback);
+        }
+
+        /// <inheritdoc cref="Dispatcher.Register"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Unregister<T>(this IDispatchTable dispatcher, AsyncStructCallback<T> callback) where T : struct, ISignal
         {
             dispatcher.Unregister(typeof(T), callback);
         }

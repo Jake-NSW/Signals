@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
@@ -8,6 +9,8 @@ namespace Woosh.Signals
         public static BlankDispatcher Instance => m_Instance ??= new BlankDispatcher();
 
         bool IDispatchExecutor.Run<T>(T data, Propagation propagation, object from) => true;
+
+        Task IDispatchExecutor.RunAsync<T>(T data, Propagation propagation, object from) => Task.CompletedTask;
 
         void IDisposable.Dispose() { }
 

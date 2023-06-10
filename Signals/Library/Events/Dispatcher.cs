@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
@@ -132,6 +133,68 @@ namespace Woosh.Signals
             }
 
             return true;
+        }
+
+        public Task RunAsync<T>(T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        {
+            var tasks = new List<Task>();
+
+            // Add tasks from this dispatcher
+            if (m_Registry.TryGetValue(typeof(T), out var stack))
+            {
+                // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
+                // are propagating events. This is not ideal, but it's not a huge deal either.
+
+                var passthrough = new Event<T>(data, from);
+
+                foreach (var evt in stack)
+                {
+                    try
+                    {
+                        (evt as Action)?.Invoke();
+                        (evt as StructCallback<T>)?.Invoke(passthrough);
+
+                        if (evt is AsyncStructCallback<T> cb)
+                            tasks.Add(cb.Invoke(passthrough));
+                    }
+                    catch (Exception e)
+                    {
+                        // The show must go on..
+#if SANDBOX
+                        Log.Error(e);
+#elif UNITY
+                        UnityEngine.Debug.LogException(e);
+#endif
+                        continue;
+                    }
+                }
+            }
+
+            // Add Propagation tasks
+            if (Attached != null && propagation != Propagation.None)
+            {
+                if (FastHasFlag(propagation, Propagation.Trickle))
+                {
+                    // Go to each child and propagate to them
+                    var dispatchers = m_Trickle.Invoke(Attached);
+                    foreach (var dispatcher in dispatchers)
+                    {
+                        if (dispatcher != null)
+                            tasks.Add(dispatcher.RunAsync(data, Propagation.Trickle, from));
+                    }
+                }
+
+                if (FastHasFlag(propagation, Propagation.Bubble))
+                {
+                    // Go to the parent and bubble up the event
+                    if (m_Bubble.Invoke(Attached) is { } bubble)
+                    {
+                        tasks.Add(bubble.RunAsync(data, Propagation.Bubble, from));
+                    }
+                }
+            }
+
+            return Task.WhenAll(tasks);
         }
 
         /// <summary>

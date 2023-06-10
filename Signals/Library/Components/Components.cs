@@ -64,6 +64,11 @@ namespace Woosh.Signals
             item.Node = null;
         }
 
+        public void Remove<TComp>() where TComp : class, IComponent<T>
+        {
+            Remove(Get<TComp>());
+        }
+
         public void Clear()
         {
             foreach (var comp in m_Storage)
@@ -82,7 +87,7 @@ namespace Woosh.Signals
 
         public int Count => m_Storage.Count;
 
-        public TComp Get<TComp>() where TComp : class, IComponent
+        public TComp Get<TComp>() where TComp : class, IComponent<T>
         {
             return m_Storage.FirstOrDefault(e => e is TComp) as TComp;
         }
