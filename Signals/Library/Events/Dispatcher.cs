@@ -98,6 +98,8 @@ namespace Woosh.Signals
                         Log.Error(e);
 #elif UNITY
                         UnityEngine.Debug.LogException(e);
+#else
+                        System.Console.WriteLine(e);
 #endif
                         continue;
                     }
@@ -166,6 +168,8 @@ namespace Woosh.Signals
                         Log.Error(e);
 #elif UNITY
                         UnityEngine.Debug.LogException(e);
+#else
+                        System.Console.WriteLine(e);
 #endif
                         continue;
                     }
@@ -196,7 +200,11 @@ namespace Woosh.Signals
                 }
             }
 
+#if SANDBOX
+            return Sandbox.GameTask.WhenAll(tasks);
+#else
             return Task.WhenAll(tasks);
+#endif
         }
 
         /// <summary>
