@@ -137,10 +137,12 @@ namespace Woosh.Signals
 
         public Task RunAsync<T>(T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
-            var tasks = new List<Task>();
+            var has = m_Registry.TryGetValue(typeof(T), out var stack);
+
+            var tasks = new List<Task>(stack?.Count ?? 0);
 
             // Add tasks from this dispatcher
-            if (m_Registry.TryGetValue(typeof(T), out var stack))
+            if (has)
             {
                 // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
                 // are propagating events. This is not ideal, but it's not a huge deal either.
