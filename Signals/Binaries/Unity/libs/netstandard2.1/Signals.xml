@@ -80,6 +80,9 @@
         <member name="M:Woosh.Signals.DispatcherUtility.Register``1(Woosh.Signals.IDispatchTable,Woosh.Signals.StructCallback{``0})">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
         </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Register``1(Woosh.Signals.IDispatchTable,Woosh.Signals.AsyncStructCallback{``0})">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
         <member name="M:Woosh.Signals.DispatcherUtility.Register``1(Woosh.Signals.IDispatchTable,System.Action)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
         </member>
@@ -89,6 +92,9 @@
         <member name="M:Woosh.Signals.DispatcherUtility.Unregister``1(Woosh.Signals.IDispatchTable,Woosh.Signals.StructCallback{``0})">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
         </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.Unregister``1(Woosh.Signals.IDispatchTable,Woosh.Signals.AsyncStructCallback{``0})">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
         <member name="M:Woosh.Signals.DispatcherUtility.Unregister``1(Woosh.Signals.IDispatchTable,System.Action)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
         </member>
@@ -97,6 +103,9 @@
         </member>
         <member name="M:Woosh.Signals.IDispatchExecutor.Run``1(``0,Woosh.Signals.Propagation,System.Object)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Run``1(``0,Woosh.Signals.Propagation,System.Object)"/>
+        </member>
+        <member name="M:Woosh.Signals.IDispatchExecutor.RunAsync``1(``0,Woosh.Signals.Propagation,System.Object)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.RunAsync``1(``0,Woosh.Signals.Propagation,System.Object)"/>
         </member>
     </members>
 </doc>
