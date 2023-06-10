@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
+    // Should this be in a namespace? It's annoying have to import it everywhere.
+    
     public static partial class DispatcherUtility
     {
         // Utility

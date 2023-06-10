@@ -9,5 +9,12 @@ namespace Woosh.Signals
 #if UNITY
     [RequireAttributeUsages, Preserve]
 #endif
-    public sealed class AutoAttribute : Attribute { }
+    public class ListenAttribute : Attribute { }
+    
+    [AttributeUsage(AttributeTargets.Method)]
+#if UNITY
+    [RequireAttributeUsages, Preserve]
+#endif
+    [Obsolete]
+    public sealed class AutoAttribute : ListenAttribute { }
 }
