@@ -8,9 +8,9 @@ namespace Woosh.Signals
         private static BlankDispatcher m_Instance;
         public static BlankDispatcher Instance => m_Instance ??= new BlankDispatcher();
 
-        bool IDispatchExecutor.Run<T>(T data, Propagation propagation, object from) => true;
+        bool IDispatchExecutor.Run<T>(Event<T> data, Propagation propagation) => true;
 
-        Task IDispatchExecutor.RunAsync<T>(T data, Propagation propagation, object from) => Task.CompletedTask;
+        Task IDispatchExecutor.RunAsync<T>(Event<T> data, Propagation propagation) => Task.CompletedTask;
 
         void IDisposable.Dispose() { }
 

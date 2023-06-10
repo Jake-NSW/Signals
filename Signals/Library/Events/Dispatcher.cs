@@ -74,9 +74,9 @@ namespace Woosh.Signals
         /// <summary>
         /// Runs a new event through the dispatcher, which will then be dispatched to all registered callbacks. An event can be consumed
         /// by one of its callbacks, which will stop the event from being dispatched to any other callbacks. This is useful for being
-        /// able to stop an event from propagating to the parent or children.
+        /// able to stop an event from propagating to the parent or children. Will not run async callbacks, as it doesn't make sense.
         /// </summary>
-        public bool Run<T>(T item, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        public bool Run<T>(Event<T> item, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             // Dispatch to our callbacks
             if (m_Registry.TryGetValue(typeof(T), out var stack))
@@ -84,14 +84,12 @@ namespace Woosh.Signals
                 // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
                 // are propagating events. This is not ideal, but it's not a huge deal either.
 
-                var passthrough = new Event<T>(item, from);
-
                 foreach (var evt in stack)
                 {
                     try
                     {
                         (evt as Action)?.Invoke();
-                        (evt as StructCallback<T>)?.Invoke(passthrough);
+                        (evt as StructCallback<T>)?.Invoke(item);
                     }
                     catch (Exception e)
                     {
@@ -115,7 +113,7 @@ namespace Woosh.Signals
                 var dispatchers = m_Trickle.Invoke(Attached);
                 foreach (var dispatcher in dispatchers)
                 {
-                    if (dispatcher?.Run(item, Propagation.Trickle, from) == false)
+                    if (dispatcher?.Run(item, Propagation.Trickle) == false)
                     {
                         return false;
                     }
@@ -127,7 +125,7 @@ namespace Woosh.Signals
                 // Go to the parent and bubble up the event
                 if (m_Bubble.Invoke(Attached) is { } bubble)
                 {
-                    if (!bubble.Run(item, Propagation.Bubble, from))
+                    if (!bubble.Run(item, Propagation.Bubble))
                         return false;
                 }
             }
@@ -135,29 +133,31 @@ namespace Woosh.Signals
             return true;
         }
 
-        public Task RunAsync<T>(T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        /// <summary>
+        /// Runs a new event through the dispatcher, which will then be dispatched to all registered callbacks. Events can't be consumed
+        /// as this is an async dispatcher. This will also run normal callbacks, but it will not wait for them to finish as they are not
+        /// async. Only use RunAsync if you know there is a callback that uses a task. As using this can be considered a performance hit.
+        /// </summary>
+        public Task RunAsync<T>(Event<T> data, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             var has = m_Registry.TryGetValue(typeof(T), out var stack);
 
+            // This is probably dumb as we are setting the capacity count to the same as the stack, but they might not have any async
+            // events in them... ?
             var tasks = new List<Task>(stack?.Count ?? 0);
 
             // Add tasks from this dispatcher
             if (has)
             {
-                // This should be made by the caller, but we'll do it here for now. This will allocate a new event on every frame when we 
-                // are propagating events. This is not ideal, but it's not a huge deal either.
-
-                var passthrough = new Event<T>(data, from);
-
                 foreach (var evt in stack)
                 {
                     try
                     {
                         (evt as Action)?.Invoke();
-                        (evt as StructCallback<T>)?.Invoke(passthrough);
+                        (evt as StructCallback<T>)?.Invoke(data);
 
                         if (evt is AsyncStructCallback<T> cb)
-                            tasks.Add(cb.Invoke(passthrough));
+                            tasks.Add(cb.Invoke(data));
                     }
                     catch (Exception e)
                     {
@@ -182,7 +182,7 @@ namespace Woosh.Signals
                     foreach (var dispatcher in dispatchers)
                     {
                         if (dispatcher != null)
-                            tasks.Add(dispatcher.RunAsync(data, Propagation.Trickle, from));
+                            tasks.Add(dispatcher.RunAsync(data, Propagation.Trickle));
                     }
                 }
 
@@ -191,7 +191,7 @@ namespace Woosh.Signals
                     // Go to the parent and bubble up the event
                     if (m_Bubble.Invoke(Attached) is { } bubble)
                     {
-                        tasks.Add(bubble.RunAsync(data, Propagation.Bubble, from));
+                        tasks.Add(bubble.RunAsync(data, Propagation.Bubble));
                     }
                 }
             }

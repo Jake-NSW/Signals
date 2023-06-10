@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
@@ -43,7 +44,9 @@ namespace Woosh.Signals
 
             for (var i = 0; i < items.Length; i++)
             {
-                var callback = items[i].Method.CreateDelegate(typeof(StructCallback<>).MakeGenericType(items[i].Event), instance);
+                var method = items[i].Method;
+                var delegateType = method.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
+                var callback = method.CreateDelegate(delegateType.MakeGenericType(items[i].Event), instance);
                 library[i] = new RegisteredEventType(items[i].Event, callback);
             }
 
@@ -67,7 +70,8 @@ namespace Woosh.Signals
                 }
 
                 var parameterType = parameters[0].ParameterType.GetGenericArguments()[0];
-                var callback = methodInfo.CreateDelegate(typeof(StructCallback<>).MakeGenericType(parameterType), instance);
+                var delegateType = methodInfo.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
+                var callback = methodInfo.CreateDelegate(delegateType.MakeGenericType(parameterType), instance);
 
                 cache[i] = (methodInfo, parameterType);
                 library[i] = new RegisteredEventType(parameterType, callback);

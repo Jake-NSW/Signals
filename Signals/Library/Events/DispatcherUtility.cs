@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
@@ -25,9 +26,30 @@ namespace Woosh.Signals
 
         /// <inheritdoc cref="Dispatcher.Run{T}"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Run<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        {
+            table.Run(new Event<T>(data, from), propagation);
+        }
+
+        /// <inheritdoc cref="Dispatcher.RunAsync{T}"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task RunAsync<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        {
+            return table.RunAsync(new Event<T>(data, from), propagation);
+        }
+
+        /// <inheritdoc cref="Dispatcher.Run{T}"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Run<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
         {
-            table.Run<T>(data: default, propagation, from);
+            table.Run<T>(default, propagation);
+        }
+
+        /// <inheritdoc cref="Dispatcher.RunAsync{T}"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Task RunAsync<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        {
+            return table.RunAsync<T>(default, propagation);
         }
 
         /// <summary>
