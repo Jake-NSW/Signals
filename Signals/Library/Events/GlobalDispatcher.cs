@@ -18,8 +18,8 @@ namespace Woosh.Signals
             foreach (var (method, type) in methods)
             {
                 var parameters = method.GetParameters();
-                if (parameters.Length != 1 || parameters[0].ParameterType != typeof(Event<T>))
-                    throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
+                // if (parameters.Length != 1 || parameters[0].ParameterType != typeof(Event<T>))
+                    // throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
 
                 if (method.IsStatic)
                 {
