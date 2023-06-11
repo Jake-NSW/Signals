@@ -1,9 +1,35 @@
-﻿#if SANDBOX
+﻿using System.Threading.Tasks;
+#if SANDBOX
 using Sandbox;
 #endif
 
 namespace Woosh.Signals
 {
+    public static class Event
+    {
+        private readonly static GlobalDispatcher m_Dispatcher;
+
+        static Event()
+        {
+            m_Dispatcher = new GlobalDispatcher();
+        }
+
+        public static void Run<T>(Event<T> signal) where T : struct, ISignal
+        {
+            m_Dispatcher.Run(signal, Propagation.None);
+        }
+
+        public static Task RunAsync<T>(Event<T> signal) where T : struct, ISignal
+        {
+            return m_Dispatcher.RunAsync(signal, Propagation.None);
+        }
+
+        public static void Register<T>(T item) where T : class
+        {
+            m_Dispatcher.Register(item);
+        }
+    }
+
     public readonly ref struct Event<T> where T : struct, ISignal
     {
         public T Data { get; }
