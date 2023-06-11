@@ -8,6 +8,8 @@ namespace Woosh.Signals
 {
     public sealed class GlobalDispatcher : IDispatchExecutor, IDisposable
     {
+        private delegate void MethodDelegate<T>(Event<T> data) where T : struct, ISignal;
+
         private readonly Dictionary<Type, WeakList<object>> m_References = new Dictionary<Type, WeakList<object>>();
 
         public bool Run<T>(Event<T> data, Propagation propagation) where T : struct, ISignal
@@ -18,12 +20,12 @@ namespace Woosh.Signals
             foreach (var (method, type) in methods)
             {
                 var parameters = method.GetParameters();
-                // if (parameters.Length != 1 || parameters[0].ParameterType != typeof(Event<T>))
-                    // throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
+                if (parameters.Length != 1 || parameters[0].ParameterType != typeof(Event<T>))
+                    throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
 
                 if (method.IsStatic)
                 {
-                    method.Invoke(null, new object[] { data });
+                    ((MethodDelegate<T>)method.CreateDelegate(typeof(MethodDelegate<T>))).Invoke(data);
                 }
                 else
                 {
@@ -31,7 +33,7 @@ namespace Woosh.Signals
                         continue;
 
                     foreach (var target in references)
-                        method.Invoke(target, new object[] { data });
+                        ((MethodDelegate<T>)method.CreateDelegate(typeof(MethodDelegate<T>), target)).Invoke(data);
                 }
             }
 
