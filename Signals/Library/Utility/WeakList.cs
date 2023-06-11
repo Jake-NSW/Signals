@@ -12,7 +12,7 @@ namespace Woosh.Signals
             m_Bucket = new List<WeakReference>(initialCapacity);
             for (var i = 0; i < initialCapacity; i++)
             {
-                m_Bucket[i] = new WeakReference(null);
+                m_Bucket.Add(new WeakReference(null));
             }
         }
 
