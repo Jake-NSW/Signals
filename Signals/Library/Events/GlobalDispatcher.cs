@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
-    public sealed class GlobalDispatcher : IDispatchExecutor, IDisposable
+    internal sealed class GlobalDispatcher : IDispatchExecutor, IDisposable
     {
         private delegate void MethodDelegate<T>(Event<T> data) where T : struct, ISignal;
 
@@ -19,10 +19,6 @@ namespace Woosh.Signals
 
             foreach (var (method, type) in methods)
             {
-                var parameters = method.GetParameters();
-                if (parameters.Length != 1 || parameters[0].ParameterType != typeof(Event<T>))
-                    throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
-
                 if (method.IsStatic)
                 {
                     ((MethodDelegate<T>)method.CreateDelegate(typeof(MethodDelegate<T>))).Invoke(data);
@@ -66,14 +62,22 @@ namespace Woosh.Signals
             if (m_Registered.Contains(type))
                 return;
 
-            var methods = type.GetMethods().Where(e => e.IsDefined(typeof(CallbackAttribute)));
+            var methods = type.GetMethods().Where(e => e.IsDefined(typeof(ListenAttribute)));
             foreach (var method in methods)
             {
-                var attribute = method.GetCustomAttribute<CallbackAttribute>();
+                var attribute = method.GetCustomAttribute<ListenAttribute>();
 
-                if (!m_Library.TryGetValue(attribute.Type, out var collection))
+                if (!method.IsStatic && attribute.Global == false)
+                    continue;
+
+                var parameters = method.GetParameters();
+                if (parameters.Length != 1)
+                    throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
+
+                var parameter = parameters[0].ParameterType.GenericTypeArguments[0];
+                if (!m_Library.TryGetValue(parameter, out var collection))
                 {
-                    m_Library.Add(attribute.Type, collection = new List<(MethodInfo, Type)>(1));
+                    m_Library.Add(parameter, collection = new List<(MethodInfo, Type)>(1));
                 }
 
                 collection.Add((method, type));

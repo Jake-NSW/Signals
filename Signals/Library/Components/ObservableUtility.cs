@@ -55,7 +55,7 @@ namespace Woosh.Signals
 
         private static Span<RegisteredEventType> AssignMethodToCache(Type type, object instance)
         {
-            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.GetCustomAttribute<ListenAttribute>() != null).ToArray();
+            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.IsStatic && m.GetCustomAttribute<ListenAttribute>()?.Global == false).ToArray();
 
             Span<RegisteredEventType> library = new RegisteredEventType[methods.Length];
             var cache = new (MethodInfo methodInfo, Type Event)[methods.Length];

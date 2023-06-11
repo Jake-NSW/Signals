@@ -9,20 +9,9 @@ namespace Woosh.Signals
 #if UNITY
     [RequireAttributeUsages, Preserve]
 #endif
-    public class ListenAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-#if UNITY
-    [RequireAttributeUsages, Preserve]
-#endif
-    public sealed class CallbackAttribute : Attribute
+    public class ListenAttribute : Attribute
     {
-        public Type Type { get; }
-
-        public CallbackAttribute(Type type)
-        {
-            Type = type;
-        }
+        public bool Global { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Method)]

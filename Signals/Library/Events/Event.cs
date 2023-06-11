@@ -7,6 +7,7 @@ namespace Woosh.Signals
 {
     public static class Event
     {
+        public static IDispatchExecutor Executor => m_Dispatcher;
         private readonly static GlobalDispatcher m_Dispatcher;
 
         static Event()
