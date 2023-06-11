@@ -1,13 +1,34 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
     // Should this be in a namespace? It's annoying have to import it everywhere.
-    
+
     public static partial class DispatcherUtility
     {
+        private static Type[] m_SignalLibrary;
+
+        /// <summary>
+        /// Gets all signal types in the current domain. This is cached.
+        /// </summary>
+        public static Type[] FindAllSignalTypes()
+        {
+            if (m_SignalLibrary != null)
+                return m_SignalLibrary;
+
+            var asm = typeof(ISignal).Assembly;
+            m_SignalLibrary = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
+                .SelectMany(e => e.GetTypes().Where(e => e.GetInterfaces().Any(e => e == typeof(ISignal))))
+                .ToArray();
+
+            return m_SignalLibrary;
+        }
+
         // Utility
 
         /// <summary>
