@@ -111,6 +111,11 @@
             Registers a new callback for the dispatcher
             </summary>
         </member>
+        <member name="M:Woosh.Signals.DispatcherUtility.FindAllSignalTypes">
+            <summary>
+            Gets all signal types in the current domain. This is cached.
+            </summary>
+        </member>
         <member name="M:Woosh.Signals.DispatcherUtility.Any``1(Woosh.Signals.IDispatchTable)">
             <summary>
             Checks if there are any callbacks registered for the given signal type.
