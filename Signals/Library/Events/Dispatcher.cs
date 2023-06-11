@@ -5,12 +5,46 @@ using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
+    /// <summary>
+    /// Which direction should flags propagate too. This is used to determine if the event should be sent to the parent or children
+    /// dispatchers.
+    /// </summary>
     [Flags]
-    public enum Propagation { None, Trickle, Bubble, Both = Trickle | Bubble }
+    public enum Propagation
+    {
+        /// <summary>
+        /// No Propagation will be used when the event is sent. Meaning this will only be sent to the callbacks registered to this
+        /// dispatcher. 
+        /// </summary>
+        None,
 
-    public delegate IDispatcher BubbleEvent(object attached);
+        /// <summary>
+        /// Sends events downstream to dispatchers that are children of this dispatcher. The children is determined by the trickle
+        /// event callback that is defined in the constructor of the dispatcher.
+        /// </summary>
+        Trickle,
 
-    public delegate IDispatcher[] TrickleEvent(object attached);
+        /// <summary>
+        /// Sends events upstream to the dispatcher that is the parent of this dispatcher. The parent is determined by the bubble
+        /// event callback that is defined in the constructor of the dispatcher.
+        /// </summary>
+        Bubble,
+
+        /// <summary>
+        /// Sends events both upstream and downstream. This is a combination of the Trickle and Bubble flags.
+        /// </summary>
+        Both = Trickle | Bubble
+    }
+
+    /// <summary>
+    /// Helper delegate for the bubble event found in <see cref="Dispatcher"/>
+    /// </summary>
+    public delegate IDispatchExecutor BubbleEvent(object attached);
+
+    /// <summary>
+    /// Helper delegate for the trickle event found in <see cref="Dispatcher"/>
+    /// </summary>
+    public delegate IDispatchExecutor[] TrickleEvent(object attached);
 
     /// <summary>
     /// The Dispatcher is responsible for dispatching events to all registered callbacks. It will also propagate the event to the
@@ -45,7 +79,6 @@ namespace Woosh.Signals
         /// Creates a basic dispatcher that doesn't propagate events.
         /// </summary>
         public Dispatcher() : this(null, null, null) { }
-
 
         /// <summary>
         /// Creates a dispatcher that has event propagation, that will use the bubble and trickle callbacks to determine the parent
@@ -151,7 +184,7 @@ namespace Woosh.Signals
             // Add tasks from this dispatcher
             if (has)
             {
-                foreach (var evt in stack)
+                foreach (var evt in stack!)
                 {
                     try
                     {
@@ -218,6 +251,9 @@ namespace Woosh.Signals
             }
         }
 
+        /// <summary>
+        /// A callback that is invoked when a new callback is registered. Useful for the recorder or debugging. 
+        /// </summary>
         public event Action<RegisteredEventType> Registered;
 
         /// <summary>

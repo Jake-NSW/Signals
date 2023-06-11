@@ -2,6 +2,9 @@ using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
+    /// <summary>
+    /// An interface for defining where callbacks are executed from.
+    /// </summary>
     public interface IDispatchExecutor
     {
         /// <inheritdoc cref="Dispatcher.Run{T}"/>

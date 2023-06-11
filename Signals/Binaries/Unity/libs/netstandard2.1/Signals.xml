@@ -4,6 +4,45 @@
         <name>Signals</name>
     </assembly>
     <members>
+        <member name="T:Woosh.Signals.Propagation">
+            <summary>
+            Which direction should flags propagate too. This is used to determine if the event should be sent to the parent or children
+            dispatchers.
+            </summary>
+        </member>
+        <member name="F:Woosh.Signals.Propagation.None">
+            <summary>
+            No Propagation will be used when the event is sent. Meaning this will only be sent to the callbacks registered to this
+            dispatcher. 
+            </summary>
+        </member>
+        <member name="F:Woosh.Signals.Propagation.Trickle">
+            <summary>
+            Sends events downstream to dispatchers that are children of this dispatcher. The children is determined by the trickle
+            event callback that is defined in the constructor of the dispatcher.
+            </summary>
+        </member>
+        <member name="F:Woosh.Signals.Propagation.Bubble">
+            <summary>
+            Sends events upstream to the dispatcher that is the parent of this dispatcher. The parent is determined by the bubble
+            event callback that is defined in the constructor of the dispatcher.
+            </summary>
+        </member>
+        <member name="F:Woosh.Signals.Propagation.Both">
+            <summary>
+            Sends events both upstream and downstream. This is a combination of the Trickle and Bubble flags.
+            </summary>
+        </member>
+        <member name="T:Woosh.Signals.BubbleEvent">
+            <summary>
+            Helper delegate for the bubble event found in <see cref="T:Woosh.Signals.Dispatcher"/>
+            </summary>
+        </member>
+        <member name="T:Woosh.Signals.TrickleEvent">
+            <summary>
+            Helper delegate for the trickle event found in <see cref="T:Woosh.Signals.Dispatcher"/>
+            </summary>
+        </member>
         <member name="T:Woosh.Signals.Dispatcher">
             <summary>
             The Dispatcher is responsible for dispatching events to all registered callbacks. It will also propagate the event to the
@@ -55,6 +94,11 @@
         <member name="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)">
             <summary>
             Unregisters a callback from the dispatcher.
+            </summary>
+        </member>
+        <member name="E:Woosh.Signals.Dispatcher.Registered">
+            <summary>
+            A callback that is invoked when a new callback is registered. Useful for the recorder or debugging. 
             </summary>
         </member>
         <member name="M:Woosh.Signals.Dispatcher.Count(System.Type)">
@@ -117,11 +161,38 @@
         <member name="M:Woosh.Signals.DispatcherUtility.Unregister(Woosh.Signals.IDispatchTable,Woosh.Signals.RegisteredEventType)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
         </member>
+        <member name="T:Woosh.Signals.IDispatcher">
+            <summary>
+            A combination of <see cref="T:Woosh.Signals.IDispatchExecutor"/> and <see cref="T:Woosh.Signals.IDispatchTable"/>.
+            </summary>
+        </member>
+        <member name="T:Woosh.Signals.IDispatchExecutor">
+            <summary>
+            An interface for defining where callbacks are executed from.
+            </summary>
+        </member>
         <member name="M:Woosh.Signals.IDispatchExecutor.Run``1(Woosh.Signals.Event{``0},Woosh.Signals.Propagation)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.Run``1(Woosh.Signals.Event{``0},Woosh.Signals.Propagation)"/>
         </member>
         <member name="M:Woosh.Signals.IDispatchExecutor.RunAsync``1(Woosh.Signals.Event{``0},Woosh.Signals.Propagation)">
             <inheritdoc cref="M:Woosh.Signals.Dispatcher.RunAsync``1(Woosh.Signals.Event{``0},Woosh.Signals.Propagation)"/>
+        </member>
+        <member name="T:Woosh.Signals.IDispatchTable">
+            <summary>
+            An interface for defining a place where callbacks are registered too.
+            </summary>
+        </member>
+        <member name="E:Woosh.Signals.IDispatchTable.Registered">
+            <inheritdoc cref="E:Woosh.Signals.Dispatcher.Registered"/>
+        </member>
+        <member name="M:Woosh.Signals.IDispatchTable.Count(System.Type)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Count(System.Type)"/>
+        </member>
+        <member name="M:Woosh.Signals.IDispatchTable.Register(System.Type,System.Delegate)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Register(System.Type,System.Delegate)"/>
+        </member>
+        <member name="M:Woosh.Signals.IDispatchTable.Unregister(System.Type,System.Delegate)">
+            <inheritdoc cref="M:Woosh.Signals.Dispatcher.Unregister(System.Type,System.Delegate)"/>
         </member>
     </members>
 </doc>
