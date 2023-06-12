@@ -9,6 +9,7 @@ namespace Woosh.Signals
 
     public static partial class DispatcherUtility
     {
+#if !SANDBOX
         private static Type[] m_SignalLibrary;
 
         /// <summary>
@@ -27,6 +28,7 @@ namespace Woosh.Signals
 
             return m_SignalLibrary;
         }
+#endif
 
         // Utility
 
