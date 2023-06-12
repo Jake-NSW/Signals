@@ -66,7 +66,6 @@ namespace Woosh.Signals
 
             foreach (var type in lib)
             {
-            Debug.Log(type.Name);
                 AddToLibrary(type);
             }
         }
@@ -80,9 +79,12 @@ namespace Woosh.Signals
             {
                 var attribute = method.GetCustomAttribute<ListenAttribute>();
 
+                Debug.Log(method.Name);
+
                 if (!method.IsStatic && attribute.Global == false)
                     continue;
 
+                Debug.Log(method.Name);
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1)
                     throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
