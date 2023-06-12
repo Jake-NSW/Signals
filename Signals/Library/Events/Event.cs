@@ -24,12 +24,7 @@ namespace Woosh.Signals
             m_Dispatcher.Run(signal, Propagation.None);
         }
 
-        public static Task RunAsync<T>(Event<T> signal) where T : struct, ISignal
-        {
-            return m_Dispatcher.RunAsync(signal, Propagation.None);
-        }
-
-        public static void Register<T>(T item) where T : class
+         public static void Register<T>(T item) where T : class
         {
             m_Dispatcher.Register(item);
         }

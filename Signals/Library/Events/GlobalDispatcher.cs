@@ -58,9 +58,9 @@ namespace Woosh.Signals
         static GlobalDispatcher()
         {
             // Register Types
-            var asm = typeof(ISignal).Assembly;
+            var asm = typeof(GlobalDispatcher).Assembly;
             var lib = AppDomain.CurrentDomain.GetAssemblies()
-                .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
+                // .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
                 .SelectMany(e => e.GetTypes().Where(e => e.IsClass));
 
             foreach (var type in lib)
