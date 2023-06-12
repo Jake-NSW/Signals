@@ -74,17 +74,14 @@ namespace Woosh.Signals
 
         private static void AddToLibrary(Type type)
         {
-            var methods = type.GetMethods().Where(e => e.IsDefined(typeof(ListenAttribute)));
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic).Where(e => e.IsDefined(typeof(ListenAttribute)));
             foreach (var method in methods)
             {
                 var attribute = method.GetCustomAttribute<ListenAttribute>();
 
-                Debug.Log(method.Name);
-
-                if (!method.IsStatic && attribute.Global == false)
+                if (!method.IsStatic && !attribute.Global)
                     continue;
-
-                Debug.Log(method.Name);
+                
                 var parameters = method.GetParameters();
                 if (parameters.Length != 1)
                     throw new InvalidOperationException($"Method {method.Name} on type {type.Name} is declared with the wrong parameters");
