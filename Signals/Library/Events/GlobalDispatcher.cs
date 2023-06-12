@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Woosh.Signals
 {
@@ -57,10 +58,12 @@ namespace Woosh.Signals
 
         static GlobalDispatcher()
         {
+            Debug.Log("Test");
+            
             // Register Types
             var asm = typeof(GlobalDispatcher).Assembly;
             var lib = AppDomain.CurrentDomain.GetAssemblies()
-                // .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
+                .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
                 .SelectMany(e => e.GetTypes().Where(e => e.IsClass));
 
             foreach (var type in lib)
