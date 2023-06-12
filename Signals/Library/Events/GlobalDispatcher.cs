@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !SANDBOX
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -49,19 +50,29 @@ namespace Woosh.Signals
                 m_References.Add(type, collection = new WeakList<object>(1));
             }
 
-            AddToLibrary(item.GetType());
             collection.Add(item);
         }
 
+        // Type Library
+
+        static GlobalDispatcher()
+        {
+            // Register Types
+            var asm = typeof(ISignal).Assembly;
+            var lib = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(e => e.GetReferencedAssemblies().Any(e => e.FullName == asm.FullName) || e == asm)
+                .SelectMany(e => e.GetTypes().Where(e => e.IsClass));
+
+            foreach (var type in lib)
+            {
+                AddToLibrary(type);
+            }
+        }
+
         private readonly static Dictionary<Type, List<(MethodInfo, Type)>> m_Library = new Dictionary<Type, List<(MethodInfo, Type)>>();
-        private readonly static HashSet<Type> m_Registered = new HashSet<Type>();
 
         private static void AddToLibrary(Type type)
         {
-            // Don't re-register the same things
-            if (m_Registered.Contains(type))
-                return;
-
             var methods = type.GetMethods().Where(e => e.IsDefined(typeof(ListenAttribute)));
             foreach (var method in methods)
             {
@@ -82,8 +93,6 @@ namespace Woosh.Signals
 
                 collection.Add((method, type));
             }
-
-            m_Registered.Add(type);
         }
 
         public void Dispose()
@@ -92,3 +101,4 @@ namespace Woosh.Signals
         }
     }
 }
+#endif

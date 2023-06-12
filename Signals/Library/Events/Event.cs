@@ -1,10 +1,14 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 #if SANDBOX
 using Sandbox;
 #endif
 
 namespace Woosh.Signals
 {
+#if !SANDBOX
     public static class Event
     {
         public static IDispatchExecutor Executor => m_Dispatcher;
@@ -30,6 +34,7 @@ namespace Woosh.Signals
             m_Dispatcher.Register(item);
         }
     }
+#endif
 
     public readonly ref struct Event<T> where T : struct, ISignal
     {
