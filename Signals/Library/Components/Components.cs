@@ -16,7 +16,9 @@ namespace Woosh.Signals
             Owner = item;
 
             m_Storage = new LinkedList<IComponent<T>>();
+#if !SANDBOX
             m_RegisteredSingletons = new HashSet<Type>();
+#endif
         }
 
         ~Components()
@@ -24,7 +26,9 @@ namespace Woosh.Signals
             Clear();
         }
 
+#if !SANDBOX
         private readonly HashSet<Type> m_RegisteredSingletons;
+#endif
         private readonly LinkedList<IComponent<T>> m_Storage;
 
         public TComp Add<TComp>(TComp item) where TComp : class, IComponent<T>
@@ -34,10 +38,12 @@ namespace Woosh.Signals
                 return null;
             }
 
+#if !SANDBOX
             if (item is ISingletonComponent && m_RegisteredSingletons.Contains(item.GetType()))
             {
                 throw new InvalidOperationException("Singleton component was already attached");
             }
+#endif
 
             if (item.Attached != null)
             {
@@ -56,11 +62,13 @@ namespace Woosh.Signals
 
             m_Storage.AddLast(node);
             item.OnAttached();
+#if !SANDBOX
             m_RegisteredSingletons.Add(item.GetType());
+#endif
 
             return item;
         }
-        
+
         public IEnumerable<TComp> All<TComp>() where TComp : class, IComponent<T>
         {
             return m_Storage.OfType<TComp>();
@@ -75,7 +83,9 @@ namespace Woosh.Signals
         {
             Detach(item);
             m_Storage.Remove(item.Node);
+#if !SANDBOX
             m_RegisteredSingletons.Remove(item.GetType());
+#endif
             item.Node = null;
         }
 

@@ -2,11 +2,13 @@
 
 namespace Woosh.Signals
 {
+#if !SANDBOX
     /// <summary>
     /// Tells <see cref="Components{T}"/> that this component should only be attached once. If it is attached again, it will
     /// not be added to the components bucket and throw an exception.
     /// </summary>
     public interface ISingletonComponent { }
+#endif
 
     public interface IComponent<T> where T : class
     {
