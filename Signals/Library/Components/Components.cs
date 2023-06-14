@@ -31,6 +31,11 @@ namespace Woosh.Signals
                 return null;
             }
 
+            if (item is ISingletonComponent && Get<TComp>() != null)
+            {
+                throw new InvalidOperationException("Singleton component was already attached");
+            }
+
             if (item.Attached != null)
             {
                 throw new InvalidOperationException("Component was already attached to something");
@@ -50,6 +55,11 @@ namespace Woosh.Signals
             item.OnAttached();
 
             return item;
+        }
+
+        public IEnumerable<TComp> All<TComp>() where TComp : class, IComponent<T>
+        {
+            return m_Storage.OfType<TComp>();
         }
 
         public bool Contains(IComponent<T> item)
@@ -119,14 +129,22 @@ namespace Woosh.Signals
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TComp Create<TComp>() where TComp : class, IComponent<T>, new()
         {
             return Add(new TComp());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TComp GetOrCreate<TComp>() where TComp : class, IComponent<T>, new()
         {
             return Get<TComp>() ?? Create<TComp>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Import<TAspect>() where TAspect : struct, IAspect<T>
+        {
+            new TAspect().Import(this);
         }
     }
 }

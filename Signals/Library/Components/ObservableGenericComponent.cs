@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Woosh.Signals
@@ -8,7 +7,7 @@ namespace Woosh.Signals
         public IDispatcher Events => Attached.Events;
 
         public T Attached { get; set; }
-        public LinkedListNode<IComponent<T>> Node { get; set; }
+        LinkedListNode<IComponent<T>> IComponent<T>.Node { get; set; }
 
         public virtual bool Attachable(T item)
         {
@@ -23,8 +22,8 @@ namespace Woosh.Signals
 
         void IComponent<T>.OnDetached()
         {
-            OnAutoUnregister();
             OnDetached();
+            OnAutoUnregister();
         }
 
         protected virtual void OnAttached() { }

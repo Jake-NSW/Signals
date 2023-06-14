@@ -4,6 +4,24 @@
         <name>Signals</name>
     </assembly>
     <members>
+        <member name="T:Woosh.Signals.ISingletonComponent">
+            <summary>
+            Tells <see cref="T:Woosh.Signals.Components`1"/> that this component should only be attached once. If it is attached again, it will
+            not be added to the components bucket and throw an exception.
+            </summary>
+        </member>
+        <member name="T:Woosh.Signals.ListenAttribute">
+            <summary>
+            The Listen attribute represents a method that can be invoked via a dispatcher. Sometimes this is automatic by the inheriting
+            type, or done via <see cref="M:Woosh.Signals.ObservableUtility.AutoRegisterEvents(System.Object,Woosh.Signals.IDispatchTable)"/>. Some methods can be global, meaning it will only be able
+            to be invoked by the global dispatcher. Static methods are always considered to be registered to the global dispatcher.
+            </summary>
+        </member>
+        <member name="P:Woosh.Signals.ListenAttribute.Global">
+            <summary>
+            Marks either or not this function should be invoked on the global dispatcher or the local one.
+            </summary>
+        </member>
         <member name="T:Woosh.Signals.Propagation">
             <summary>
             Which direction should flags propagate too. This is used to determine if the event should be sent to the parent or children

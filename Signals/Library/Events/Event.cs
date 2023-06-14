@@ -19,12 +19,17 @@ namespace Woosh.Signals
             m_Dispatcher = new GlobalDispatcher();
         }
 
+        public static void Run<T>(T signal) where T : struct, ISignal
+        {
+            m_Dispatcher.Run(new Event<T>(signal), Propagation.None);
+        }
+
         public static void Run<T>(Event<T> signal) where T : struct, ISignal
         {
             m_Dispatcher.Run(signal, Propagation.None);
         }
 
-         public static void Register<T>(T item) where T : class
+        public static void Register<T>(T item) where T : class
         {
             m_Dispatcher.Register(item);
         }
