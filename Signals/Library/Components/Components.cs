@@ -7,7 +7,7 @@ namespace Woosh.Signals
 {
     public delegate void RefStructInputAction<TInput, in TType>(ref TInput input, TType item);
 
-    public sealed class Components<T> where T : class
+    public sealed class Components<T> : IReadOnlyComponentSystem<T> where T : class
     {
         public T Owner { get; }
 
@@ -60,7 +60,7 @@ namespace Woosh.Signals
 
             return item;
         }
-
+        
         public IEnumerable<TComp> All<TComp>() where TComp : class, IComponent<T>
         {
             return m_Storage.OfType<TComp>();
@@ -105,6 +105,12 @@ namespace Woosh.Signals
         public TComp Get<TComp>() where TComp : class, IComponent<T>
         {
             return m_Storage.FirstOrDefault(e => e is TComp) as TComp;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Has<TComp>() where TComp : class, IComponent<T>
+        {
+            return Get<TComp>() != null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
