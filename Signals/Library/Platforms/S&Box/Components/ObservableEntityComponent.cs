@@ -34,7 +34,10 @@ namespace Woosh.Signals
             m_Events = recoding.Events.ToArray();
         }
 
-        protected virtual void OnAutoRegister() { }
+        protected virtual void OnAutoRegister()
+        {
+            ObservableUtility.AutoRegisterEvents(this, Events);
+        }
 
         protected override void OnDeactivate()
         {

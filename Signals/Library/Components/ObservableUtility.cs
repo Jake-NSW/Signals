@@ -141,16 +141,11 @@ namespace Woosh.Signals
 
                 if (parameters.Length != 1)
                 {
-                    throw new MethodAccessException("Invalid Auto Parameters");
+                    throw new Exception("Invalid Auto Parameters");
                 }
 
                 var parameterType = TypeLibrary.GetType(parameters[0].ParameterType).GenericArguments[0];
-
-                if (!parameterType.IsGenericType)
-                {
-                    throw new MethodAccessException("Invalid Auto Parameters");
-                }
-
+                
                 var delegateType = methodInfo.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
                 var callback = methodInfo.CreateDelegate(TypeLibrary.GetType(delegateType).MakeGenericType(new[] { parameterType }), instance);
 
