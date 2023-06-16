@@ -14,12 +14,6 @@ public abstract class EntityHudComponent<TPanel, TEntity> : EntityHudComponent<T
 
 public abstract class EntityHudComponent<T> : ObservableEntityComponent where T : RootPanel, new()
 {
-    protected override void OnAutoRegister()
-    {
-        // Only care on the Client, as its UI
-        Register<EntityPossessed>(OnPawnPossessed);
-    }
-
     protected override void OnActivate()
     {
         if (Game.IsClient)
@@ -42,8 +36,10 @@ public abstract class EntityHudComponent<T> : ObservableEntityComponent where T 
 #endif
     }
 
+    public T Panel => m_Panel;
     private T m_Panel;
 
+    [Listen]
     private void OnPawnPossessed(Event<EntityPossessed> signal)
     {
         // Delete Old UI
