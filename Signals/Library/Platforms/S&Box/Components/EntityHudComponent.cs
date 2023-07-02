@@ -1,23 +1,28 @@
 ﻿#if SANDBOX
+using System.Runtime.CompilerServices;
 using Sandbox;
 using Sandbox.UI;
 
 namespace Woosh.Signals;
 
-public abstract class EntityHudComponent<TPanel, TEntity> : EntityHudComponent<TPanel> where TPanel : RootPanel, new() where TEntity : class, IObservableEntity
+public abstract class EntityHudComponent<TEntity> : EntityHudComponent<RootPanel, TEntity> where TEntity : class, IObservableEntity { }
+
+public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent where T : RootPanel, new() where TEntity : class, IObservableEntity
 {
     public new TEntity Entity => base.Entity as TEntity;
-    protected Entity UnderlyingEntity => base.Entity;
 
-    public override bool CanAddToEntity(Entity entity) => entity is TEntity;
-}
+    public override bool CanAddToEntity(Entity entity)
+    {
+        return entity is TEntity;
+    }
 
-public abstract class EntityHudComponent<T> : ObservableEntityComponent where T : RootPanel, new()
-{
     protected override void OnActivate()
     {
         if (Game.IsClient)
         {
+            // Make sure we have a root panel handler
+            _ = Handler;
+
             // Only Register Events on Client
             base.OnActivate();
         }
@@ -28,22 +33,35 @@ public abstract class EntityHudComponent<T> : ObservableEntityComponent where T 
         }
     }
 
-    private void CreateUI()
+    private HudComponentHandler<T> Handler
     {
-        OnCreateUI(m_Panel = new T());
-#if DEBUG
-        m_Panel.ElementName = $"{GetType().Name} / {Entity.Name}";
-#endif
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Entity.Components.GetOrCreate<HudComponentHandler<T>>();
     }
 
-    public T Panel => m_Panel;
-    private T m_Panel;
+    private Panel m_Root;
+
+    private void CreateUI()
+    {
+        m_Root = new Panel
+        {
+            ElementName = GetType().Name,
+            Style =
+            {
+                Position = PositionMode.Absolute,
+                Width = Length.Percent(100),
+                Height = Length.Percent(100)
+            }
+        };
+
+        OnCreateUI(m_Root);
+        Handler.Panel.AddChild(m_Root);
+    }
 
     [Listen]
     private void OnPawnPossessed(Event<EntityPossessed> signal)
     {
-        // Delete Old UI
-        m_Panel?.Delete();
+        m_Root?.Delete();
 
         if (signal.Data.Client != Game.LocalClient)
             return;
@@ -54,10 +72,11 @@ public abstract class EntityHudComponent<T> : ObservableEntityComponent where T 
     protected override void OnDeactivate()
     {
         base.OnDeactivate();
-        m_Panel?.Delete();
+
+        m_Root?.Delete();
     }
 
-    protected virtual void OnCreateUI(T root) { }
+    protected virtual void OnCreateUI(Panel root) { }
 }
 
 #endif
