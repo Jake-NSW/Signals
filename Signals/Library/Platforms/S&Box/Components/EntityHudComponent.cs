@@ -25,11 +25,9 @@ public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent
 
             // Only Register Events on Client
             base.OnActivate();
-        }
 
-        if (Game.IsClient && Game.LocalPawn == Entity)
-        {
-            CreateUI();
+            if (Game.LocalPawn == Entity)
+                CreateUI();
         }
     }
 
@@ -41,20 +39,28 @@ public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent
 
     private Panel m_Root;
 
-    private void CreateUI()
+    protected Panel CreateFullscreenPanel()
     {
-        m_Root = new Panel
+        return new Panel()
         {
-            ElementName = GetType().Name,
             Style =
             {
-                Position = PositionMode.Absolute,
-                Width = Length.Percent(100),
-                Height = Length.Percent(100)
+                Position = PositionMode.Absolute, Width = Length.Percent(100), Height = Length.Percent(100)
             }
         };
+    }
 
-        OnCreateUI(m_Root);
+    private void CreateUI()
+    {
+        m_Root = OnCreateUI();
+
+        if (m_Root == null)
+        {
+            Log.Error($"No Root was returned from {GetType().Name}.OnCreateUI()");
+            return;
+        }
+
+        m_Root.ElementName = GetType().Name;
         Handler.Panel.AddChild(m_Root);
     }
 
@@ -71,12 +77,14 @@ public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent
 
     protected override void OnDeactivate()
     {
-        base.OnDeactivate();
-
-        m_Root?.Delete();
+        if (Game.IsClient)
+        {
+            base.OnDeactivate();
+            m_Root?.Delete();
+        }
     }
 
-    protected virtual void OnCreateUI(Panel root) { }
+    protected virtual Panel OnCreateUI() { return null; }
 }
 
 #endif

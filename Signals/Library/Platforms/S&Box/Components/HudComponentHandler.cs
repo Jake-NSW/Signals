@@ -23,7 +23,7 @@ internal sealed class HudComponentHandler<T> : ObservableEntityComponent where T
 
             m_Panel = new T();
 #if DEBUG
-            m_Panel.ElementName = $"{GetType().Name} / {Entity.Name}";
+            m_Panel.ElementName = $"{typeof(T).Name} / {Entity.Name}";
 #endif
             return m_Panel;
         }
@@ -44,7 +44,7 @@ internal sealed class HudComponentHandler<T> : ObservableEntityComponent where T
         // Ignore...
         if (Game.LocalPawn == Entity)
             return;
-        
+
         m_Panel?.Delete();
     }
 }

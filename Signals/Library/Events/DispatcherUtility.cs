@@ -113,7 +113,7 @@ namespace Woosh.Signals
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Register(this IDispatchTable table, RegisteredEventType evt)
         {
-            if (evt.Event != null)
+            if (evt is { Event: not null, Delegate: not null })
                 table.Register(evt.Event, evt.Delegate);
         }
 

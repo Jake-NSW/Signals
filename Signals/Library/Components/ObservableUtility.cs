@@ -108,11 +108,14 @@ namespace Woosh.Signals
             return AutoMethodsFromType(instance.GetType(), instance);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegisteredEventType[] AutoMethodsFromType(Type type, object instance)
         {
-            if (!m_Libraries.TryGetValue(type, out var items))
+            // Hotload Issue, sometimes the method breaks when hotloading... :(
+            if (!m_Libraries.TryGetValue(type, out var items) || items.Any(e => e.Method == null))
+            {
+                m_Libraries.Remove(type);
                 return AssignMethodToCache(type, instance);
+            }
 
             var library = new RegisteredEventType[items.Length];
 
@@ -145,7 +148,7 @@ namespace Woosh.Signals
                 }
 
                 var parameterType = TypeLibrary.GetGenericArguments(parameters[0].ParameterType)[0];
-                
+
                 var delegateType = methodInfo.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
                 var callback = methodInfo.CreateDelegate(TypeLibrary.GetType(delegateType).MakeGenericType(new[] { parameterType }), instance);
 
