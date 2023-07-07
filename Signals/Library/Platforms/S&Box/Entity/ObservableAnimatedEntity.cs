@@ -6,7 +6,7 @@ namespace Woosh.Signals;
 public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEntity
 {
     private IDispatcher m_Events;
-    public IDispatcher Events => m_Events ??= Dispatcher.CreateForEntity(this);
+    public virtual IDispatcher Events => m_Events ??= Dispatcher.CreateForEntity(this);
 
     // Model
 
@@ -36,5 +36,10 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEnti
         Events.Run(new EntityTakenDamage(this, info));
     }
 
+    protected override void OnAnimGraphCreated()
+    {
+        base.OnAnimGraphCreated();
+        Events.Run(new AnimGraphCreated(this));
+    }
 }
 #endif

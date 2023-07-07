@@ -37,6 +37,7 @@ public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent
         get => Entity.Components.GetOrCreate<HudComponentHandler<T>>();
     }
 
+    public Panel Panel => m_Root;
     private Panel m_Root;
 
     protected Panel CreateFullscreenPanel()
