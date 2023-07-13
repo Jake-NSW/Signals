@@ -29,12 +29,22 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEnti
         base.OnComponentRemoved(component);
         Events.Run(new ComponentRemoved(component));
     }
+    
+    // Damage
 
     public override void TakeDamage(DamageInfo info)
     {
         base.TakeDamage(info);
         Events.Run(new EntityTakenDamage(this, info));
     }
+
+    protected override void OnPhysicsCollision(CollisionEventData eventData)
+    {
+        base.OnPhysicsCollision(eventData);
+        Events.Run(new PhysicsCollision(eventData));
+    }
+    
+    // Animator
 
     protected override void OnAnimGraphCreated()
     {
