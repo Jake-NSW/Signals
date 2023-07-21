@@ -5,8 +5,21 @@ namespace Woosh.Signals;
 
 public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEntity
 {
-    private IDispatcher m_Events;
-    public virtual IDispatcher Events => m_Events ??= Dispatcher.CreateForEntity(this);
+    private IDispatcher m_Dispatcher;
+    private RegisteredEventType[] m_Events;
+
+    public IDispatcher Events => m_Dispatcher ??= Dispatcher.CreateForEntity(this, static entity => entity.OnAutoRegister(), ref m_Events);
+
+    protected virtual void OnAutoRegister()
+    {
+        ObservableUtility.AutoRegisterEvents(this, Events);
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        Dispatcher.DisposeForEntity(this, ref m_Dispatcher, ref m_Events);
+    }
 
     // Model
 
@@ -29,7 +42,7 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEnti
         base.OnComponentRemoved(component);
         Events.Run(new ComponentRemoved(component));
     }
-    
+
     // Damage
 
     public override void TakeDamage(DamageInfo info)
@@ -43,7 +56,7 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEnti
         base.OnPhysicsCollision(eventData);
         Events.Run(new PhysicsCollision(eventData));
     }
-    
+
     // Animator
 
     protected override void OnAnimGraphCreated()

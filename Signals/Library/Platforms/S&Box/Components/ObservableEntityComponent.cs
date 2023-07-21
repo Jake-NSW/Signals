@@ -8,6 +8,11 @@ namespace Woosh.Signals
 {
     public abstract class ObservableEntityComponent : EntityComponent
     {
+        public override bool CanAddToEntity(Entity entity)
+        {
+            return entity is IObservable;
+        }
+
         protected virtual IDispatcher Events
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

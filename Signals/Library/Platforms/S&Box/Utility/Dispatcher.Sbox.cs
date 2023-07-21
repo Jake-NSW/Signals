@@ -1,5 +1,6 @@
 ﻿#if SANDBOX
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Sandbox;
 
@@ -7,6 +8,10 @@ namespace Woosh.Signals;
 
 partial class Dispatcher
 {
+    //
+    // Client
+    //
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDispatcher FindForEntity(IEntity entity)
     {
@@ -36,7 +41,23 @@ partial class Dispatcher
         return new[] { (client.Pawn as IObservable)?.Events };
     }
 
+    //
     // Entity
+    //
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void DisposeForEntity<T>(T entity, ref IDispatcher dispatcher, ref RegisteredEventType[] cache) where T : Entity, IObservable
+    {
+        if (cache is { Length: > 0 })
+        {
+            foreach (var item in cache)
+            {
+                dispatcher.Unregister(item);
+            }
+        }
+
+        dispatcher = BlankDispatcher.Instance;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDispatcher CreateForEntity<T>(T entity) where T : Entity, IObservable
@@ -46,6 +67,22 @@ partial class Dispatcher
             bubble: OnBubbleEntity,
             trickle: OnTrickleEntity
         );
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IDispatcher CreateForEntity<T>(T entity, Action<T> autoRegister, ref RegisteredEventType[] cache) where T : Entity, IObservable
+    {
+        var dispatcher = CreateForEntity(entity);
+
+        // Auto Register
+        var recoding = dispatcher.Record();
+        using (recoding)
+        {
+            autoRegister(entity);
+        }
+
+        cache = recoding.Events.ToArray();
+        return dispatcher;
     }
 
     private static IDispatcher OnBubbleEntity(object o)
