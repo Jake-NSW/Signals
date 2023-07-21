@@ -70,9 +70,9 @@ partial class Dispatcher
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IDispatcher CreateForEntity<T>(T entity, Action<T> autoRegister, ref RegisteredEventType[] cache) where T : Entity, IObservable
+    public static void CreateForEntity<T>(T entity, Action<T> autoRegister, ref IDispatcher dispatcher, ref RegisteredEventType[] cache) where T : Entity, IObservable
     {
-        var dispatcher = CreateForEntity(entity);
+        dispatcher = CreateForEntity(entity);
 
         // Auto Register
         var recoding = dispatcher.Record();
@@ -82,7 +82,6 @@ partial class Dispatcher
         }
 
         cache = recoding.Events.ToArray();
-        return dispatcher;
     }
 
     private static IDispatcher OnBubbleEntity(object o)

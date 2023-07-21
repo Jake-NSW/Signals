@@ -8,8 +8,17 @@ public abstract class ObservableEntity : Entity, IObservableEntity
     private IDispatcher m_Dispatcher;
     private RegisteredEventType[] m_Events;
 
-    public IDispatcher Events => m_Dispatcher ??= Dispatcher.CreateForEntity(this, static entity => entity.OnAutoRegister(), ref m_Events);
+    public IDispatcher Events
+    {
+        get
+        {
+            if (m_Dispatcher != null)
+                return m_Dispatcher;
 
+            Dispatcher.CreateForEntity(this, static entity => entity.OnAutoRegister(), ref m_Dispatcher, ref m_Events);
+            return m_Dispatcher;
+        }
+    }
 
     protected virtual void OnAutoRegister()
     {
@@ -20,6 +29,12 @@ public abstract class ObservableEntity : Entity, IObservableEntity
     {
         base.OnDestroy();
         Dispatcher.DisposeForEntity(this, ref m_Dispatcher, ref m_Events);
+    }
+
+    public override void Simulate(IClient cl)
+    {
+        base.Simulate(cl);
+        Events.Run(new SimulateSnapshot(cl));
     }
 
     // Components
