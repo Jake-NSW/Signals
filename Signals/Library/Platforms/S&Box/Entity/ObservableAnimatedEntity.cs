@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Woosh.Signals;
 
-public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEntity
+public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservable
 {
     private IDispatcher m_Dispatcher;
     private RegisteredEventType[] m_Events;
@@ -36,7 +36,7 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservableEnti
         base.Simulate(cl);
         Events.Run(new SimulateSnapshot(cl));
     }
-
+    
     // Model
 
     public override void OnNewModel(Model model)

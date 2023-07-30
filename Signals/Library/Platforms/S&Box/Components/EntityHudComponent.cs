@@ -5,9 +5,9 @@ using Sandbox.UI;
 
 namespace Woosh.Signals;
 
-public abstract class EntityHudComponent<TEntity> : EntityHudComponent<RootPanel, TEntity> where TEntity : class, IObservableEntity { }
+public abstract class EntityHudComponent<TEntity> : EntityHudComponent<RootPanel, TEntity> where TEntity : Entity, IObservable { }
 
-public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent where T : RootPanel, new() where TEntity : class, IObservableEntity
+public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent where T : RootPanel, new() where TEntity : Entity, IObservable
 {
     public new TEntity Entity => base.Entity as TEntity;
 
@@ -70,7 +70,7 @@ public abstract class EntityHudComponent<T, TEntity> : ObservableEntityComponent
     {
         m_Root?.Delete();
 
-        if (signal.Data.Client != Game.LocalClient)
+        if (signal.Signal.Client != Game.LocalClient)
             return;
 
         CreateUI();

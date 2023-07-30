@@ -13,11 +13,10 @@ namespace Woosh.Signals
 #if !SANDBOX
         static ObservableUtility()
         {
-            m_Libraries = new Dictionary<Type, (MethodInfo Method, Type Event)[]>();
+            m_Libraries = new Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]>();
         }
 
-        private readonly static Dictionary<Type, (MethodInfo Method, Type Event)[]> m_Libraries;
-
+        private readonly static Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]> m_Libraries;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<RegisteredEventType> AutoRegisterEvents(object instance, IDispatchTable table)
@@ -40,66 +39,75 @@ namespace Woosh.Signals
         public static Span<RegisteredEventType> AutoMethodsFromType(Type type, object instance)
         {
             if (!m_Libraries.TryGetValue(type, out var items))
-                return AssignMethodToCache(type, instance);
+            {
+                AssignMethodToCache(type);
+                items = m_Libraries[type];
+            }
 
             Span<RegisteredEventType> library = new RegisteredEventType[items.Length];
 
             for (var i = 0; i < items.Length; i++)
             {
                 var method = items[i].Method;
-                var delegateType = method.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
-                var callback = method.CreateDelegate(delegateType.MakeGenericType(items[i].Event), instance);
+                var callback = method.CreateDelegate(items[i].Delegate, instance);
                 library[i] = new RegisteredEventType(items[i].Event, callback);
             }
 
             return library;
         }
 
-        private static Span<RegisteredEventType> AssignMethodToCache(Type type, object instance)
+        private static Type CreateDelegateFromMethod(MethodInfo method, Type evt)
         {
-            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => !m.IsStatic && m.GetCustomAttribute<ListenAttribute>()?.Global == false).ToArray();
+            Type delegateType = null;
 
-            Span<RegisteredEventType> library = new RegisteredEventType[methods.Length];
-            var cache = new (MethodInfo methodInfo, Type Event)[methods.Length];
+            var isRef = method.GetParameters()[0].ParameterType.IsByRef;
+            if (method.ReturnType == typeof(Task))
+            {
+                delegateType = isRef ? typeof(RefAsyncStructCallback<>) : typeof(AsyncStructCallback<>);
+            }
+
+            delegateType ??= isRef ? typeof(RefStructCallback<>) : typeof(StructCallback<>);
+            return delegateType.MakeGenericType(evt);
+        }
+
+
+        private static void AssignMethodToCache(Type type)
+        {
+            var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(m => !m.IsStatic && m.GetCustomAttribute<ListenAttribute>()?.Global == false)
+                .ToArray();
+
+            var cache = new (MethodInfo methodInfo, Type Delegate, Type Event)[methods.Length];
 
             for (var i = 0; i < methods.Length; i++)
             {
                 var methodInfo = methods[i];
                 var parameters = methodInfo.GetParameters();
                 if (parameters.Length != 1 && !parameters[0].ParameterType.IsGenericParameter)
-                {
                     throw new MethodAccessException("Invalid Auto Parameters");
-                }
 
                 var parameterType = parameters[0].ParameterType.GetGenericArguments()[0];
-                var delegateType = methodInfo.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
-                var callback = methodInfo.CreateDelegate(delegateType.MakeGenericType(parameterType), instance);
-
-                cache[i] = (methodInfo, parameterType);
-                library[i] = new RegisteredEventType(parameterType, callback);
+                var delegateType = CreateDelegateFromMethod(methodInfo, parameterType);
+                cache[i] = (methodInfo, delegateType, parameterType);
             }
 
             m_Libraries.Add(type, cache);
-            return library;
         }
 #else
         static ObservableUtility()
         {
-            m_Libraries = new Dictionary<Type, (MethodDescription Method, Type Event)[]>();
+            m_Libraries = new Dictionary<Type, (MethodDescription Method, Type Delegate, Type Event)[]>();
         }
 
-        private readonly static Dictionary<Type, (MethodDescription Method, Type Event)[]> m_Libraries;
+        private readonly static Dictionary<Type, (MethodDescription Method, Type Delegate, Type Event)[]> m_Libraries;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RegisteredEventType[] AutoRegisterEvents(object instance, IDispatchTable table)
+        public static void AutoRegisterEvents(object instance, IDispatchTable table)
         {
-            var events = AutoMethodsFromType(instance);
-            foreach (var evt in events)
+            foreach (var evt in AutoMethodsFromType(instance))
             {
                 table.Register(evt);
             }
-
-            return events;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -114,28 +122,38 @@ namespace Woosh.Signals
             if (!m_Libraries.TryGetValue(type, out var items) || items.Any(e => e.Method == null))
             {
                 m_Libraries.Remove(type);
-                return AssignMethodToCache(type, instance);
+                AssignMethodToCache(type);
+                items = m_Libraries[type];
             }
 
             var library = new RegisteredEventType[items.Length];
-
             for (var i = 0; i < items.Length; i++)
             {
-                var method = items[i].Method;
-                var delegateType = method.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
-                var callback = method.CreateDelegate(TypeLibrary.GetType(delegateType).MakeGenericType(new[] { items[i].Event }), instance);
+                var callback = items[i].Method.CreateDelegate(items[i].Delegate, instance);
                 library[i] = new RegisteredEventType(items[i].Event, callback);
             }
 
             return library;
         }
 
-        private static RegisteredEventType[] AssignMethodToCache(Type type, object instance)
+        private static Type CreateDelegateFromMethod(MethodDescription method, Type evt)
+        {
+            Type delegateType = null;
+
+            const bool isRef = false; // method.Parameters[0].ParameterType.IsByRef;
+            if (method.ReturnType == typeof(Task))
+            {
+                delegateType = isRef ? typeof(RefAsyncStructCallback<>) : typeof(AsyncStructCallback<>);
+            }
+
+            delegateType ??= isRef ? typeof(RefStructCallback<>) : typeof(StructCallback<>);
+            return TypeLibrary.GetType(delegateType).MakeGenericType(new[] { evt });
+        }
+
+        private static void AssignMethodToCache(Type type)
         {
             var methods = TypeLibrary.GetType(type).Methods.Where(e => !e.IsStatic && e.GetCustomAttribute<ListenAttribute>()?.Global == false).ToArray();
-
-            var library = new RegisteredEventType[methods.Length];
-            var cache = new (MethodDescription methodInfo, Type Event)[methods.Length];
+            var cache = new (MethodDescription methodInfo, Type Delegate, Type Event)[methods.Length];
 
             for (var i = 0; i < methods.Length; i++)
             {
@@ -143,21 +161,14 @@ namespace Woosh.Signals
                 var parameters = methodInfo.Parameters;
 
                 if (parameters.Length != 1)
-                {
                     throw new Exception("Invalid Auto Parameters");
-                }
 
                 var parameterType = TypeLibrary.GetGenericArguments(parameters[0].ParameterType)[0];
-
-                var delegateType = methodInfo.ReturnType == typeof(Task) ? typeof(AsyncStructCallback<>) : typeof(StructCallback<>);
-                var callback = methodInfo.CreateDelegate(TypeLibrary.GetType(delegateType).MakeGenericType(new[] { parameterType }), instance);
-
-                cache[i] = (methodInfo, parameterType);
-                library[i] = new RegisteredEventType(parameterType, callback);
+                var delegateType = CreateDelegateFromMethod(methodInfo, parameterType);
+                cache[i] = (methodInfo, delegateType, parameterType);
             }
 
             m_Libraries.Add(type, cache);
-            return library;
         }
 #endif
     }

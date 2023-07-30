@@ -8,9 +8,9 @@ namespace Woosh.Signals
     public interface IDispatchExecutor
     {
         /// <inheritdoc cref="Dispatcher.Run{T}"/>
-        bool Run<T>(Event<T> data, Propagation propagation) where T : struct, ISignal;
+        bool Run<T>(ref Event<T> data, Propagation propagation) where T : struct, ISignal;
 
         /// <inheritdoc cref="Dispatcher.RunAsync{T}"/>
-        Task RunAsync<T>(Event<T> data, Propagation propagation) where T : struct, ISignal;
+        Task RunAsync<T>(ref Event<T> data, Propagation propagation) where T : struct, ISignal;
     }
 }

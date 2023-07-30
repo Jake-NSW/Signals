@@ -118,6 +118,20 @@ namespace Woosh.Signals
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TComp Get<TComp>(Predicate<TComp> predicate) where TComp : class, IComponent<T>
+        {
+            return m_Storage.FirstOrDefault(e => e is TComp comp && predicate(comp)) as TComp;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TAspect Aspect<TAspect>() where TAspect : struct, IAspect<T>
+        {
+            var aspect = new TAspect();
+            aspect.ImportFrom(this);
+            return aspect;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Has<TComp>() where TComp : class, IComponent<T>
         {
             return Get<TComp>() != null;
@@ -165,7 +179,7 @@ namespace Woosh.Signals
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Import<TAspect>() where TAspect : struct, IAspect<T>
         {
-            new TAspect().Import(this);
+            new TAspect().ExportTo(this);
         }
     }
 }

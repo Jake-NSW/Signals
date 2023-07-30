@@ -109,7 +109,7 @@ namespace Woosh.Signals
         /// by one of its callbacks, which will stop the event from being dispatched to any other callbacks. This is useful for being
         /// able to stop an event from propagating to the parent or children. Will not run async callbacks, as it doesn't make sense.
         /// </summary>
-        public bool Run<T>(Event<T> item, Propagation propagation = Propagation.None) where T : struct, ISignal
+        public bool Run<T>(ref Event<T> item, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             // Dispatch to our callbacks
             if (m_Registry.TryGetValue(typeof(T), out var stack))
@@ -123,6 +123,7 @@ namespace Woosh.Signals
                     {
                         (evt as Action)?.Invoke();
                         (evt as StructCallback<T>)?.Invoke(item);
+                        (evt as RefStructCallback<T>)?.Invoke(ref item);
                     }
                     catch (Exception e)
                     {
@@ -136,11 +137,15 @@ namespace Woosh.Signals
 #endif
                         continue;
                     }
+
+                    if (item.Consumed)
+                        break;
                 }
             }
 
-            if (Attached == null || propagation == Propagation.None)
-                return true;
+            var shouldPropagate = !item.Consumed && !item.Stopping;
+            if (!shouldPropagate || Attached == null || propagation == Propagation.None)
+                return !item.Consumed;
 
             if (FastHasFlag(propagation, Propagation.Trickle))
             {
@@ -148,7 +153,7 @@ namespace Woosh.Signals
                 var dispatchers = m_Trickle.Invoke(Attached);
                 foreach (var dispatcher in dispatchers)
                 {
-                    if (dispatcher?.Run(item, Propagation.Trickle) == false)
+                    if (dispatcher?.Run(ref item, Propagation.Trickle) == false)
                     {
                         return false;
                     }
@@ -160,7 +165,7 @@ namespace Woosh.Signals
                 // Go to the parent and bubble up the event
                 if (m_Bubble.Invoke(Attached) is { } bubble)
                 {
-                    if (!bubble.Run(item, Propagation.Bubble))
+                    if (!bubble.Run(ref item, Propagation.Bubble))
                         return false;
                 }
             }
@@ -173,7 +178,7 @@ namespace Woosh.Signals
         /// as this is an async dispatcher. This will also run normal callbacks, but it will not wait for them to finish as they are not
         /// async. Only use RunAsync if you know there is a callback that uses a task. As using this can be considered a performance hit.
         /// </summary>
-        public Task RunAsync<T>(Event<T> data, Propagation propagation = Propagation.None) where T : struct, ISignal
+        public Task RunAsync<T>(ref Event<T> data, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             var has = m_Registry.TryGetValue(typeof(T), out var stack);
 
@@ -193,6 +198,9 @@ namespace Woosh.Signals
 
                         if (evt is AsyncStructCallback<T> cb)
                             tasks.Add(cb.Invoke(data));
+
+                        if (evt is RefAsyncStructCallback<T> cb2)
+                            tasks.Add(cb2.Invoke(ref data));
                     }
                     catch (Exception e)
                     {
@@ -219,7 +227,7 @@ namespace Woosh.Signals
                     foreach (var dispatcher in dispatchers)
                     {
                         if (dispatcher != null)
-                            tasks.Add(dispatcher.RunAsync(data, Propagation.Trickle));
+                            tasks.Add(dispatcher.RunAsync(ref data, Propagation.Trickle));
                     }
                 }
 
@@ -228,7 +236,7 @@ namespace Woosh.Signals
                     // Go to the parent and bubble up the event
                     if (m_Bubble.Invoke(Attached) is { } bubble)
                     {
-                        tasks.Add(bubble.RunAsync(data, Propagation.Bubble));
+                        tasks.Add(bubble.RunAsync(ref data, Propagation.Bubble));
                     }
                 }
             }

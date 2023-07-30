@@ -3,7 +3,7 @@ using Sandbox;
 
 namespace Woosh.Signals;
 
-public abstract class ObservableEntity : Entity, IObservableEntity
+public abstract class ObservableEntity : Entity, IObservable
 {
     private IDispatcher m_Dispatcher;
     private RegisteredEventType[] m_Events;

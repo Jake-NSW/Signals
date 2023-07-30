@@ -13,7 +13,7 @@ namespace Woosh.Signals
 
         private readonly Dictionary<Type, WeakList<object>> m_References = new Dictionary<Type, WeakList<object>>();
 
-        public bool Run<T>(Event<T> data, Propagation propagation) where T : struct, ISignal
+        public bool Run<T>(ref Event<T> data, Propagation propagation) where T : struct, ISignal
         {
             if (!m_Library.TryGetValue(typeof(T), out var methods))
                 return false;
@@ -37,7 +37,7 @@ namespace Woosh.Signals
             return true;
         }
 
-        public Task RunAsync<T>(Event<T> data, Propagation propagation) where T : struct, ISignal
+        public Task RunAsync<T>(ref Event<T> data, Propagation propagation) where T : struct, ISignal
         {
             throw new InvalidOperationException("Not Supported");
         }

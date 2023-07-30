@@ -75,11 +75,9 @@ namespace Woosh.Signals
         }
     }
 
-    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservable
+    public abstract class ObservableEntityComponent<T> : ObservableEntityComponent where T : class, IObservable, IEntity
     {
         public new T Entity => base.Entity as T;
-        protected Entity UnderlyingEntity => base.Entity;
-
         public override bool CanAddToEntity(Entity entity) => entity is T;
     }
 }

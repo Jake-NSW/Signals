@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace Woosh.Signals
 {
-    // Should this be in a namespace? It's annoying have to import it everywhere.
-
     public static partial class DispatcherUtility
     {
 #if !SANDBOX
@@ -50,28 +48,30 @@ namespace Woosh.Signals
 
         /// <inheritdoc cref="Dispatcher.Run{T}"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Run<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        public static bool Run<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
-            table.Run(new Event<T>(data, from), propagation);
+            var evt = new Event<T>(data);
+            return table.Run(ref evt, propagation);
         }
 
         /// <inheritdoc cref="Dispatcher.RunAsync{T}"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task RunAsync<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        public static Task RunAsync<T>(this IDispatchExecutor table, T data, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
-            return table.RunAsync(new Event<T>(data, from), propagation);
+            var evt = new Event<T>(data);
+            return table.RunAsync(ref evt, propagation);
         }
 
         /// <inheritdoc cref="Dispatcher.Run{T}"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Run<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        public static bool Run<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
-            table.Run<T>(default, propagation);
+            return table.Run<T>(default, propagation);
         }
 
         /// <inheritdoc cref="Dispatcher.RunAsync{T}"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Task RunAsync<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None, object from = null) where T : struct, ISignal
+        public static Task RunAsync<T>(this IDispatchExecutor table, Propagation propagation = Propagation.None) where T : struct, ISignal
         {
             return table.RunAsync<T>(default, propagation);
         }
@@ -87,6 +87,13 @@ namespace Woosh.Signals
         }
 
         // Register
+
+        /// <inheritdoc cref="Dispatcher.Register"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Register<T>(this IDispatchTable dispatcher, RefStructCallback<T> callback) where T : struct, ISignal
+        {
+            dispatcher.Register(typeof(T), callback);
+        }
 
         /// <inheritdoc cref="Dispatcher.Register"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -118,6 +125,13 @@ namespace Woosh.Signals
         }
 
         // Unregister
+
+        /// <inheritdoc cref="Dispatcher.Register"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Unregister<T>(this IDispatchTable dispatcher, RefStructCallback<T> callback) where T : struct, ISignal
+        {
+            dispatcher.Unregister(typeof(T), callback);
+        }
 
         /// <inheritdoc cref="Dispatcher.Unregister"/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

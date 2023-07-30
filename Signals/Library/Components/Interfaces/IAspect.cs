@@ -2,6 +2,7 @@
 {
     public interface IAspect<T> where T : class
     {
-        void Import(Components<T> system);
+        void ImportFrom(Components<T> system) { }
+        void ExportTo(Components<T> system);
     }
 }
