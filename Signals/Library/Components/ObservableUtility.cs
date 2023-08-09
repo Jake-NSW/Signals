@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+#if SANDBOX
 using Sandbox;
+#endif
 
 namespace Woosh.Signals
 {
@@ -13,10 +15,10 @@ namespace Woosh.Signals
 #if !SANDBOX
         static ObservableUtility()
         {
-            m_Libraries = new Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]>();
+            s_Libraries = new Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]>();
         }
 
-        private readonly static Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]> m_Libraries;
+        private readonly static Dictionary<Type, (MethodInfo Method, Type Delegate, Type Event)[]> s_Libraries;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<RegisteredEventType> AutoRegisterEvents(object instance, IDispatchTable table)
@@ -38,10 +40,10 @@ namespace Woosh.Signals
 
         public static Span<RegisteredEventType> AutoMethodsFromType(Type type, object instance)
         {
-            if (!m_Libraries.TryGetValue(type, out var items))
+            if (!s_Libraries.TryGetValue(type, out var items))
             {
                 AssignMethodToCache(type);
-                items = m_Libraries[type];
+                items = s_Libraries[type];
             }
 
             Span<RegisteredEventType> library = new RegisteredEventType[items.Length];
@@ -91,7 +93,7 @@ namespace Woosh.Signals
                 cache[i] = (methodInfo, delegateType, parameterType);
             }
 
-            m_Libraries.Add(type, cache);
+            s_Libraries.Add(type, cache);
         }
 #else
         static ObservableUtility()
