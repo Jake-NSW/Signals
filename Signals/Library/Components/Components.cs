@@ -81,6 +81,11 @@ namespace Woosh.Signals
 
         public void Remove(IComponent<T> item)
         {
+            if (item == null)
+            {
+                throw new ArgumentNullException(nameof(item), "Trying to remove a component that is null");
+            }
+
             Detach(item);
             m_Storage.Remove(item.Node);
 #if !SANDBOX
@@ -117,18 +122,15 @@ namespace Woosh.Signals
             return m_Storage.FirstOrDefault(e => e is TComp) as TComp;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TComp Get<TComp>(Predicate<TComp> predicate) where TComp : class, IComponent<T>
         {
             return m_Storage.FirstOrDefault(e => e is TComp comp && predicate(comp)) as TComp;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TAspect Aspect<TAspect>() where TAspect : struct, IAspect<T>
+        public bool TryGet<TComp>(out TComp item) where TComp : class, IComponent<T>
         {
-            var aspect = new TAspect();
-            aspect.ImportFrom(this);
-            return aspect;
+            return (item = Get<TComp>()) != null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
