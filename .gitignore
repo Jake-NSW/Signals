@@ -9,4 +9,7 @@ Signals/Library/bin
 Signals/Library/obj 
 Signals/Library/Properties 
 
+Signals/Library/*.*.csproj
+Signals/Library/*.csproj
+
 **/*.DotSettings.user

@@ -15,7 +15,7 @@
   "EditorReferences": null,
   "Metadata": {
     "ProjectTemplate": null,
-    "CsProjName": "Signals.Library",
+    "CsProjName": "Signals",
     "Summary": "A simple Component based \u0022Observer Pattern\u0022 implementation",
     "Description": "",
     "Public": false,
