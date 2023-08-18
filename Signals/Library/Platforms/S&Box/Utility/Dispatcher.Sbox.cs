@@ -46,16 +46,9 @@ partial class Dispatcher
     //
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void DisposeForEntity<T>(T entity, ref IDispatcher dispatcher, ref RegisteredEventType[] cache) where T : Entity, IObservable
+    public static void DisposeForEntity<T>(T item, ref IDispatcher dispatcher) where T : Entity, IObservable
     {
-        if (cache is { Length: > 0 })
-        {
-            foreach (var item in cache)
-            {
-                dispatcher.Unregister(item);
-            }
-        }
-
+        dispatcher.Dispose();
         dispatcher = BlankDispatcher.Instance;
     }
 

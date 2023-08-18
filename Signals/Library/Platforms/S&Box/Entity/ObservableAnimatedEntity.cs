@@ -28,7 +28,7 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservable
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        Dispatcher.DisposeForEntity(this, ref m_Dispatcher, ref m_Events);
+        Dispatcher.DisposeForEntity(this, ref m_Dispatcher);
     }
 
     public override void Simulate(IClient cl)
@@ -36,7 +36,7 @@ public abstract class ObservableAnimatedEntity : AnimatedEntity, IObservable
         base.Simulate(cl);
         Events.Run(new SimulateSnapshot(cl));
     }
-    
+
     // Model
 
     public override void OnNewModel(Model model)

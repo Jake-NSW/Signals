@@ -28,7 +28,7 @@ public abstract class ObservableEntity : Entity, IObservable
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        Dispatcher.DisposeForEntity(this, ref m_Dispatcher, ref m_Events);
+        Dispatcher.DisposeForEntity(this, ref m_Dispatcher);
     }
 
     public override void Simulate(IClient cl)
