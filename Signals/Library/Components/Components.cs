@@ -124,7 +124,17 @@ namespace Woosh.Signals
 
         public IComponent<T> Get(Type type)
         {
-            return m_Storage.FirstOrDefault(e => e.GetType() == type || e.GetType().IsSubclassOf(type));
+            return m_Storage.FirstOrDefault(Predicate);
+
+            bool Predicate(IComponent<T> e)
+            {
+                if (type.IsInterface)
+                {
+                    return e.GetType().GetInterfaces().Contains(type);
+                }
+
+                return e.GetType() == type || e.GetType().IsSubclassOf(type);
+            }
         }
 
         public TComp Get<TComp>(Predicate<TComp> predicate) where TComp : class, IComponent<T>
