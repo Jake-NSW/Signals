@@ -122,6 +122,11 @@ namespace Woosh.Signals
             return m_Storage.FirstOrDefault(e => e is TComp) as TComp;
         }
 
+        public IComponent<T> Get(Type type)
+        {
+            return m_Storage.FirstOrDefault(e => e.GetType() == type || e.GetType().IsSubclassOf(type));
+        }
+
         public TComp Get<TComp>(Predicate<TComp> predicate) where TComp : class, IComponent<T>
         {
             return m_Storage.FirstOrDefault(e => e is TComp comp && predicate(comp)) as TComp;
